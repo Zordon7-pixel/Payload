@@ -11,7 +11,7 @@ export default function Login() {
       const { data } = await api.post('/auth/login', { email, password })
       localStorage.setItem('hc_token', data.token)
       navigate(data.user.role === 'driver' ? '/my-loads' : '/')
-    } catch { setError('Invalid email or password') } finally { setLoading(false) }
+    } catch { setError('Wrong email or password.') } finally { setLoading(false) }
   }
   return (
     <div className="min-h-screen bg-[#0a0f1e] flex items-center justify-center p-4">
