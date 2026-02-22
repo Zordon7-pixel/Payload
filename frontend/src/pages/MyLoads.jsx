@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { MapPin, Package, CheckCircle, Truck, Navigation, DollarSign, RefreshCw } from 'lucide-react'
+import { MapPin, Package, CheckCircle, Truck, Navigation, DollarSign, RefreshCw, BookOpen } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import api from '../lib/api'
 
 // Driver's next-action map — what button to show and what status it sets
@@ -114,6 +115,7 @@ const MATERIAL_EMOJI = { asphalt:'🛣️', gravel:'🪨', sand:'🏜️', salt:
 export default function MyLoads() {
   const [loads, setLoads]   = useState([])
   const [loading, setLoad]  = useState(true)
+  const navigate = useNavigate()
 
   function load() {
     setLoad(true)
@@ -136,9 +138,14 @@ export default function MyLoads() {
             <div className="text-xs text-slate-500">My Loads</div>
           </div>
         </div>
-        <button onClick={load} className="text-slate-400 hover:text-amber-400 transition-colors">
-          <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
-        </button>
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate('/logbook')} className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-amber-400 transition-colors border border-[#1f2937] hover:border-amber-500 px-3 py-1.5 rounded-lg">
+            <BookOpen size={13}/> Logbook
+          </button>
+          <button onClick={load} className="text-slate-400 hover:text-amber-400 transition-colors">
+            <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+          </button>
+        </div>
       </div>
 
       <div className="px-4 py-4 space-y-6 max-w-lg mx-auto">

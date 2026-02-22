@@ -145,6 +145,38 @@ db.exec(`
   );
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS daily_logs (
+    id            TEXT PRIMARY KEY,
+    company_id    TEXT REFERENCES companies(id),
+    driver_id     TEXT REFERENCES users(id),
+    truck_id      TEXT REFERENCES trucks(id),
+    log_date      TEXT NOT NULL,
+    start_mileage INTEGER,
+    end_mileage   INTEGER,
+    loads_completed INTEGER DEFAULT 0,
+    weather       TEXT,
+    notes         TEXT,
+    incidents     TEXT,
+    created_at    TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS pretrip_inspections (
+    id              TEXT PRIMARY KEY,
+    company_id      TEXT REFERENCES companies(id),
+    driver_id       TEXT REFERENCES users(id),
+    truck_id        TEXT REFERENCES trucks(id),
+    inspection_date TEXT NOT NULL,
+    inspection_time TEXT,
+    odometer        INTEGER,
+    items           TEXT NOT NULL,
+    overall_pass    INTEGER DEFAULT 1,
+    defects_noted   TEXT,
+    driver_signature TEXT,
+    created_at      TEXT DEFAULT (datetime('now'))
+  );
+`);
+
 // Migrations
 const migrations = [
   `ALTER TABLE trucks ADD COLUMN dot_inspection_date TEXT`,

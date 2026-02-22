@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { LayoutDashboard, Truck, ClipboardList, BarChart3, Users, Wrench, UserCog, Fuel, LogOut, Menu } from 'lucide-react'
+import { LayoutDashboard, Truck, ClipboardList, BarChart3, Users, Wrench, UserCog, BookOpen, LogOut, Menu } from 'lucide-react'
 import FeedbackButton from './FeedbackButton'
 import { isOwner } from '../lib/auth'
 
@@ -8,6 +8,7 @@ const allNav = [
   { to: '/',           icon: LayoutDashboard, label: 'Dashboard',   ownerOnly: true  },
   { to: '/loads',      icon: ClipboardList,   label: 'Loads',       ownerOnly: true  },
   { to: '/my-loads',   icon: ClipboardList,   label: 'My Loads',    ownerOnly: false, driverOnly: true },
+  { to: '/logbook',    icon: BookOpen,        label: 'Logbook',     ownerOnly: false, driverOnly: false },
   { to: '/trucks',     icon: Truck,           label: 'Fleet',       ownerOnly: true  },
   { to: '/drivers',    icon: Users,           label: 'Drivers',     ownerOnly: true  },
   { to: '/maintenance',icon: Wrench,          label: 'Maintenance', ownerOnly: true  },

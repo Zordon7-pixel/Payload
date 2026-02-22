@@ -17,6 +17,7 @@ app.use('/api/drivers',    require('./routes/drivers'));
 app.use('/api/maintenance',require('./routes/maintenance'));
 app.use('/api/fuel',       require('./routes/fuel'));
 app.use('/api/users',      require('./routes/users'));
+app.use('/api/logbook',    require('./routes/logbook'));
 
 const frontendDist = path.join(__dirname, '../../frontend/dist');
 app.use(express.static(frontendDist));
