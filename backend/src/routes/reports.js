@@ -1,8 +1,9 @@
 const router = require('express').Router();
 const db = require('../db');
 const auth = require('../middleware/auth');
+const { requireOwner } = require('../middleware/roles');
 
-router.get('/summary', auth, (req, res) => {
+router.get('/summary', auth, requireOwner, (req, res) => {
   const cid = req.user.company_id;
 
   const total     = db.prepare('SELECT COUNT(*) as n FROM loads WHERE company_id = ?').get(cid).n;

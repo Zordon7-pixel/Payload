@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const db = require('../db');
 const auth = require('../middleware/auth');
+const { isPureDriver } = require('../middleware/roles');
 const { v4: uuidv4 } = require('uuid');
 
 const STATUSES = ['pending','dispatched','loaded','in_transit','delivered','invoiced','paid'];
@@ -23,14 +24,20 @@ function enrichLoad(l) {
 }
 
 router.get('/', auth, (req, res) => {
+  // Drivers only see their assigned loads; owners/owner-operators see all
+  const driverFilter = isPureDriver(req.user.role) ? 'AND l.driver_id = ?' : '';
+  const params = isPureDriver(req.user.role)
+    ? [req.user.company_id, req.user.id]
+    : [req.user.company_id];
+
   const loads = db.prepare(`
     SELECT l.*, t.name as truck_name, t.plate, c.name as customer_name, u.name as driver_name
     FROM loads l
     LEFT JOIN trucks t ON t.id = l.truck_id
     LEFT JOIN customers c ON c.id = l.customer_id
     LEFT JOIN users u ON u.id = l.driver_id
-    WHERE l.company_id = ? ORDER BY l.created_at DESC
-  `).all(req.user.company_id);
+    WHERE l.company_id = ? ${driverFilter} ORDER BY l.created_at DESC
+  `).all(...params);
   res.json({ loads });
 });
 
@@ -41,6 +48,7 @@ router.get('/:id', auth, (req, res) => {
 });
 
 router.post('/', auth, (req, res) => {
+  if (isPureDriver(req.user.role)) return res.status(403).json({ error: 'Drivers cannot create loads' });
   const { truck_id, customer_id, driver_id, source, source_ref, material, pickup_location, dropoff_location, pickup_date, tons, miles, rate_per_ton, rate_per_mile, flat_rate, rate_type, fuel_cost, driver_pay, other_expenses, notes } = req.body;
   const count = db.prepare('SELECT COUNT(*) as n FROM loads WHERE company_id = ?').get(req.user.company_id);
   const loadNumber = `HC-2026-${String(count.n + 1).padStart(4, '0')}`;
@@ -75,6 +83,17 @@ router.put('/:id', auth, (req, res) => {
 router.put('/:id/status', auth, (req, res) => {
   const { status } = req.body;
   if (!STATUSES.includes(status)) return res.status(400).json({ error: 'Invalid status' });
+
+  // Drivers can only update their own loads, and only road-relevant statuses
+  const load = db.prepare('SELECT * FROM loads WHERE id = ? AND company_id = ?').get(req.params.id, req.user.company_id);
+  if (!load) return res.status(404).json({ error: 'Not found' });
+
+  if (isPureDriver(req.user.role)) {
+    if (load.driver_id !== req.user.id) return res.status(403).json({ error: 'Not your load' });
+    const driverStatuses = ['loaded', 'in_transit', 'delivered'];
+    if (!driverStatuses.includes(status)) return res.status(403).json({ error: 'Drivers can only set: loaded, in_transit, delivered' });
+  }
+
   const extra = {};
   if (status === 'delivered') extra.delivery_date = new Date().toISOString().split('T')[0];
   if (status === 'paid') extra.paid = 1;

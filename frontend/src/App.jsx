@@ -8,8 +8,19 @@ import Trucks from './pages/Trucks'
 import Reports from './pages/Reports'
 import Drivers from './pages/Drivers'
 import Maintenance from './pages/Maintenance'
+import Team from './pages/Team'
+import MyLoads from './pages/MyLoads'
 
 const PrivateRoute = ({ children }) => localStorage.getItem('hc_token') ? children : <Navigate to="/login" />
+
+const OwnerRoute = ({ children }) => {
+  if (!localStorage.getItem('hc_token')) return <Navigate to="/login" />
+  try {
+    const role = JSON.parse(atob(localStorage.getItem('hc_token').split('.')[1])).role
+    if (!['owner','owner_operator'].includes(role)) return <Navigate to="/my-loads" />
+  } catch {}
+  return children
+}
 
 export default function App() {
   return (
@@ -21,10 +32,12 @@ export default function App() {
           <Route path="loads" element={<Loads />} />
           <Route path="loads/:id" element={<LoadDetail />} />
           <Route path="trucks" element={<Trucks />} />
-          <Route path="drivers" element={<Drivers />} />
-          <Route path="maintenance" element={<Maintenance />} />
-          <Route path="reports" element={<Reports />} />
+          <Route path="drivers" element={<OwnerRoute><Drivers /></OwnerRoute>} />
+          <Route path="maintenance" element={<OwnerRoute><Maintenance /></OwnerRoute>} />
+          <Route path="reports" element={<OwnerRoute><Reports /></OwnerRoute>} />
+          <Route path="team" element={<OwnerRoute><Team /></OwnerRoute>} />
         </Route>
+        <Route path="/my-loads" element={<PrivateRoute><MyLoads /></PrivateRoute>} />
       </Routes>
     </BrowserRouter>
   )

@@ -1,21 +1,31 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { LayoutDashboard, Truck, ClipboardList, BarChart3, Users, Wrench, LogOut, Menu } from 'lucide-react'
+import { LayoutDashboard, Truck, ClipboardList, BarChart3, Users, Wrench, UserCog, Fuel, LogOut, Menu } from 'lucide-react'
 import FeedbackButton from './FeedbackButton'
+import { isOwner } from '../lib/auth'
 
-const nav = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/loads', icon: ClipboardList, label: 'Loads' },
-  { to: '/trucks', icon: Truck, label: 'Fleet' },
-  { to: '/drivers', icon: Users, label: 'Drivers' },
-  { to: '/maintenance', icon: Wrench, label: 'Maintenance' },
-  { to: '/reports', icon: BarChart3, label: 'Reports' },
+const allNav = [
+  { to: '/',           icon: LayoutDashboard, label: 'Dashboard',   ownerOnly: true  },
+  { to: '/loads',      icon: ClipboardList,   label: 'Loads',       ownerOnly: true  },
+  { to: '/my-loads',   icon: ClipboardList,   label: 'My Loads',    ownerOnly: false, driverOnly: true },
+  { to: '/trucks',     icon: Truck,           label: 'Fleet',       ownerOnly: true  },
+  { to: '/drivers',    icon: Users,           label: 'Drivers',     ownerOnly: true  },
+  { to: '/maintenance',icon: Wrench,          label: 'Maintenance', ownerOnly: true  },
+  { to: '/reports',    icon: BarChart3,       label: 'Reports',     ownerOnly: true  },
+  { to: '/team',       icon: UserCog,         label: 'Team',        ownerOnly: true  },
 ]
 
 export default function Layout() {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const logout = () => { localStorage.removeItem('hc_token'); navigate('/login') }
+
+  const owner = isOwner()
+  const nav = allNav.filter(n => {
+    if (n.driverOnly && owner) return false   // owner-operators see My Loads via /my-loads but not in sidebar
+    if (n.ownerOnly  && !owner) return false
+    return true
+  })
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">

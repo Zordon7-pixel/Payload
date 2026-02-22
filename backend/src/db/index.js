@@ -145,13 +145,15 @@ db.exec(`
   );
 `);
 
-// Migrations — add columns to existing trucks table
-const truckMigrations = [
+// Migrations
+const migrations = [
   `ALTER TABLE trucks ADD COLUMN dot_inspection_date TEXT`,
   `ALTER TABLE trucks ADD COLUMN registration_expiry TEXT`,
   `ALTER TABLE trucks ADD COLUMN insurance_expiry TEXT`,
   `ALTER TABLE trucks ADD COLUMN notes TEXT`,
+  `ALTER TABLE users ADD COLUMN truck_id TEXT REFERENCES trucks(id)`,
+  `ALTER TABLE users ADD COLUMN phone TEXT`,
 ];
-truckMigrations.forEach(sql => { try { db.exec(sql); } catch (_) {} });
+migrations.forEach(sql => { try { db.exec(sql); } catch (_) {} });
 
 module.exports = db;

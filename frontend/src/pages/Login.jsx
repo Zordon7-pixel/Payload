@@ -9,7 +9,8 @@ export default function Login() {
     e.preventDefault(); setLoading(true); setError('')
     try {
       const { data } = await api.post('/auth/login', { email, password })
-      localStorage.setItem('hc_token', data.token); navigate('/')
+      localStorage.setItem('hc_token', data.token)
+      navigate(data.user.role === 'driver' ? '/my-loads' : '/')
     } catch { setError('Invalid email or password') } finally { setLoading(false) }
   }
   return (
