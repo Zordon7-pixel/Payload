@@ -1,12 +1,14 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { LayoutDashboard, Truck, ClipboardList, BarChart3, LogOut, Menu } from 'lucide-react'
+import { LayoutDashboard, Truck, ClipboardList, BarChart3, Users, Wrench, LogOut, Menu } from 'lucide-react'
 import FeedbackButton from './FeedbackButton'
 
 const nav = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/loads', icon: ClipboardList, label: 'Loads' },
   { to: '/trucks', icon: Truck, label: 'Fleet' },
+  { to: '/drivers', icon: Users, label: 'Drivers' },
+  { to: '/maintenance', icon: Wrench, label: 'Maintenance' },
   { to: '/reports', icon: BarChart3, label: 'Reports' },
 ]
 

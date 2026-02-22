@@ -6,6 +6,8 @@ import Loads from './pages/Loads'
 import LoadDetail from './pages/LoadDetail'
 import Trucks from './pages/Trucks'
 import Reports from './pages/Reports'
+import Drivers from './pages/Drivers'
+import Maintenance from './pages/Maintenance'
 
 const PrivateRoute = ({ children }) => localStorage.getItem('hc_token') ? children : <Navigate to="/login" />
 
@@ -19,6 +21,8 @@ export default function App() {
           <Route path="loads" element={<Loads />} />
           <Route path="loads/:id" element={<LoadDetail />} />
           <Route path="trucks" element={<Trucks />} />
+          <Route path="drivers" element={<Drivers />} />
+          <Route path="maintenance" element={<Maintenance />} />
           <Route path="reports" element={<Reports />} />
         </Route>
       </Routes>

@@ -12,7 +12,10 @@ app.use('/api/loads', require('./routes/loads'));
 app.use('/api/trucks', require('./routes/trucks'));
 app.use('/api/customers', require('./routes/customers'));
 app.use('/api/reports', require('./routes/reports'));
-app.use('/api/feedback', require('./routes/feedback'));
+app.use('/api/feedback',    require('./routes/feedback'));
+app.use('/api/drivers',    require('./routes/drivers'));
+app.use('/api/maintenance',require('./routes/maintenance'));
+app.use('/api/fuel',       require('./routes/fuel'));
 
 const frontendDist = path.join(__dirname, '../../frontend/dist');
 app.use(express.static(frontendDist));

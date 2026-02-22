@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Truck, Package, DollarSign, TrendingUp, AlertCircle, Plus } from 'lucide-react'
+import { Truck, Package, DollarSign, TrendingUp, AlertCircle, Plus, BarChart2 } from 'lucide-react'
 import api from '../lib/api'
 import AddLoadModal from '../components/AddLoadModal'
+
+const SOURCE_LABELS = { aggtrans:'Aggtrans', aggdirect:'AggDirect', direct:'Direct', loadboard:'Load Board', other:'Other' }
+const SOURCE_COLORS = { aggtrans:'#f97316', aggdirect:'#3b82f6', direct:'#22c55e', loadboard:'#a855f7', other:'#64748b' }
 
 const STATUS_COLORS = { pending:'#64748b', dispatched:'#3b82f6', loaded:'#f97316', in_transit:'#eab308', delivered:'#10b981', invoiced:'#a855f7', paid:'#22c55e' }
 const STATUS_LABELS = { pending:'Pending', dispatched:'Dispatched', loaded:'Loaded', in_transit:'In Transit', delivered:'Delivered', invoiced:'Invoiced', paid:'Paid' }
@@ -89,6 +92,51 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      {/* Source Profitability — the Aggtrans/AggDirect killer */}
+      {data.bySource?.length > 0 && (
+        <div className="bg-[#111827] rounded-xl border border-[#1f2937] p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <BarChart2 size={16} className="text-amber-400" />
+            <h2 className="font-semibold text-sm text-white">Source Profitability</h2>
+            <span className="text-[10px] text-slate-500 ml-auto">Which platform actually pays you more?</span>
+          </div>
+          <div className="space-y-3">
+            {data.bySource.map(s => {
+              const maxGross = Math.max(...data.bySource.map(x => x.gross), 1)
+              const pct = (s.gross / maxGross) * 100
+              const color = SOURCE_COLORS[s.source] || SOURCE_COLORS.other
+              return (
+                <div key={s.source}>
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{background:color}} />
+                      <span className="font-semibold text-white">{SOURCE_LABELS[s.source] || s.source}</span>
+                      <span className="text-slate-500">{s.loads} load{s.loads!==1?'s':''}</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-slate-400">${s.gross.toFixed(0)} gross</span>
+                      <span className="text-emerald-400 font-semibold">${s.net.toFixed(0)} net</span>
+                      <span className={`font-bold ${s.margin_pct >= 50 ? 'text-emerald-400' : s.margin_pct >= 30 ? 'text-amber-400' : 'text-red-400'}`}>{s.margin_pct}% margin</span>
+                    </div>
+                  </div>
+                  <div className="h-1.5 bg-[#0a0f1e] rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all" style={{width:`${pct}%`, background:color}} />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          {data.bySource.length > 1 && (() => {
+            const best = [...data.bySource].sort((a,b) => b.margin_pct - a.margin_pct)[0]
+            return (
+              <div className="mt-3 pt-3 border-t border-[#1f2937] text-xs text-slate-400">
+                💡 <strong className="text-white">{SOURCE_LABELS[best.source] || best.source}</strong> is your most profitable source at <strong className="text-emerald-400">{best.margin_pct}% margin</strong>
+              </div>
+            )
+          })()}
+        </div>
+      )}
+
       {showAdd && <AddLoadModal onClose={() => setShowAdd(false)} onSaved={() => { setShowAdd(false); load() }} />}
     </div>
   )

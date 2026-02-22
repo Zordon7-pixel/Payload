@@ -97,6 +97,61 @@ db.exec(`
     date TEXT,
     created_at TEXT DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS drivers (
+    id TEXT PRIMARY KEY,
+    company_id TEXT REFERENCES companies(id),
+    name TEXT NOT NULL,
+    phone TEXT,
+    email TEXT,
+    cdl_number TEXT,
+    cdl_expiry TEXT,
+    medical_card_expiry TEXT,
+    pay_type TEXT DEFAULT 'percent',
+    pay_rate REAL DEFAULT 25,
+    status TEXT DEFAULT 'active',
+    notes TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS maintenance_logs (
+    id TEXT PRIMARY KEY,
+    company_id TEXT REFERENCES companies(id),
+    truck_id TEXT REFERENCES trucks(id),
+    service_type TEXT NOT NULL,
+    service_date TEXT,
+    mileage INTEGER,
+    cost REAL DEFAULT 0,
+    vendor TEXT,
+    notes TEXT,
+    next_service_date TEXT,
+    next_service_mileage INTEGER,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS fuel_logs (
+    id TEXT PRIMARY KEY,
+    company_id TEXT REFERENCES companies(id),
+    truck_id TEXT REFERENCES trucks(id),
+    driver_id TEXT,
+    log_date TEXT,
+    gallons REAL DEFAULT 0,
+    price_per_gallon REAL DEFAULT 0,
+    total_cost REAL DEFAULT 0,
+    odometer INTEGER,
+    location TEXT,
+    notes TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
 `);
+
+// Migrations — add columns to existing trucks table
+const truckMigrations = [
+  `ALTER TABLE trucks ADD COLUMN dot_inspection_date TEXT`,
+  `ALTER TABLE trucks ADD COLUMN registration_expiry TEXT`,
+  `ALTER TABLE trucks ADD COLUMN insurance_expiry TEXT`,
+  `ALTER TABLE trucks ADD COLUMN notes TEXT`,
+];
+truckMigrations.forEach(sql => { try { db.exec(sql); } catch (_) {} });
 
 module.exports = db;
