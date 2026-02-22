@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body { background: #0a0f1e; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.pipeline-scroll { overflow-x: auto; padding-bottom: 12px; }
+.pipeline-scroll::-webkit-scrollbar { height: 6px; }
+.pipeline-scroll::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
