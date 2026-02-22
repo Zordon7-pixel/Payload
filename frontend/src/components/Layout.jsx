@@ -2,6 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { LayoutDashboard, Truck, ClipboardList, BarChart3, Users, Wrench, UserCog, BookOpen, Fuel, LogOut, Menu } from 'lucide-react'
 import FeedbackButton from './FeedbackButton'
+import HelpDesk from './HelpDesk'
 import { isOwner } from '../lib/auth'
 
 const allNav = [
@@ -71,7 +72,7 @@ export default function Layout() {
           <button onClick={() => setOpen(true)} className="text-slate-400 hover:text-white"><Menu size={20} /></button>
           <span className="font-bold text-sm">🚛 PAYLOAD</span>
         </header>
-        <main className="flex-1 overflow-auto p-4 md:p-6"><Outlet /><FeedbackButton /></main>
+        <main className="flex-1 overflow-auto p-4 md:p-6"><Outlet /><FeedbackButton /><HelpDesk /></main>
       </div>
     </div>
   )
