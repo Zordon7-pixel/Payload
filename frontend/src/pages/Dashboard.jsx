@@ -1,14 +1,46 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Truck, Package, DollarSign, TrendingUp, AlertCircle, Plus, BarChart2 } from 'lucide-react'
+import { Truck, Package, DollarSign, Route, AlertCircle, Plus, BarChart2 } from 'lucide-react'
 import api from '../lib/api'
 import AddLoadModal from '../components/AddLoadModal'
 
 const SOURCE_LABELS = { direct:'Direct', dat:'DAT', truckstop:'Truckstop.com', broker:'Broker', aggtrans:'Aggtrans', aggdirect:'AggDirect', other:'Other' }
 const SOURCE_COLORS = { direct:'#22c55e', dat:'#f97316', truckstop:'#3b82f6', broker:'#a855f7', aggtrans:'#f59e0b', aggdirect:'#06b6d4', other:'#64748b' }
 
-const STATUS_COLORS = { pending:'#64748b', dispatched:'#3b82f6', loaded:'#f97316', in_transit:'#eab308', delivered:'#10b981', invoiced:'#a855f7', paid:'#22c55e' }
-const STATUS_LABELS = { pending:'Pending', dispatched:'Dispatched', loaded:'Loaded', in_transit:'In Transit', delivered:'Delivered', invoiced:'Invoiced', paid:'Paid' }
+const LOAD_STATUS = {
+  pending: { color: 'bg-slate-700 text-slate-200', icon: '📋', label: 'Pending' },
+  dispatched: { color: 'bg-blue-900/60 text-blue-300', icon: '📡', label: 'Dispatched' },
+  loaded: { color: 'bg-amber-900/60 text-amber-300', icon: '📦', label: 'Loaded' },
+  in_transit: { color: 'bg-orange-900/60 text-orange-300', icon: '🚛', label: 'In Transit' },
+  delivered: { color: 'bg-emerald-900/60 text-emerald-300', icon: '✅', label: 'Delivered' },
+  invoiced: { color: 'bg-purple-900/60 text-purple-300', icon: '🧾', label: 'Invoiced' },
+  paid: { color: 'bg-green-900/60 text-green-300', icon: '💰', label: 'Paid' },
+}
+
+function LoadStatusBadge({ status }) {
+  const cfg = LOAD_STATUS[status] || { color: 'bg-slate-700 text-slate-300', icon: '❓', label: status }
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${cfg.color}`}>
+      <span>{cfg.icon}</span>{cfg.label}
+    </span>
+  )
+}
+
+function useCountUp(target, duration = 1000) {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    if (!target) return
+    let start = 0
+    const step = target / (duration / 16)
+    const timer = setInterval(() => {
+      start += step
+      if (start >= target) { setCount(target); clearInterval(timer) }
+      else setCount(Math.floor(start))
+    }, 16)
+    return () => clearInterval(timer)
+  }, [target, duration])
+  return count
+}
 
 export default function Dashboard() {
   const [data, setData] = useState(null)
@@ -16,13 +48,31 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const load = () => api.get('/reports/summary').then(r => setData(r.data))
   useEffect(() => { load() }, [])
-  if (!data) return <div className="flex items-center justify-center h-64 text-slate-500">Loading...</div>
+
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours()
+    if (hour < 12) return 'Good morning 👋'
+    if (hour < 18) return 'Good afternoon 👋'
+    return 'Good evening 👋'
+  }, [])
+
+  if (!data) return <div className="flex items-center justify-center h-64 text-slate-500">Loading your fleet data...</div>
+
+  const totalLoads = Number(data.totalLoads || data.total || (data.active || 0) + (data.delivered || 0))
+  const grossRevenue = Number(data.grossRev || 0)
+  const totalMilesRaw = Number(data.totalMiles || data.miles || (data.recent || []).reduce((sum, l) => sum + Number(l.miles || 0), 0))
+  const unpaidAmount = Number(data.unpaid?.amount || 0)
+
+  const totalLoadsCount = useCountUp(totalLoads)
+  const grossRevenueCount = useCountUp(grossRevenue)
+  const totalMilesCount = useCountUp(totalMilesRaw)
+  const unpaidCount = useCountUp(unpaidAmount)
 
   const stats = [
-    { label: 'Active Loads', value: data.active, icon: Package, color: 'text-amber-400', bg: 'bg-amber-900/30' },
-    { label: 'Delivered', value: data.delivered, icon: Truck, color: 'text-emerald-400', bg: 'bg-emerald-900/30' },
-    { label: 'Gross Revenue', value: `$${data.grossRev?.toLocaleString()}`, icon: DollarSign, color: 'text-blue-400', bg: 'bg-blue-900/30' },
-    { label: 'Net Profit', value: `$${data.netProfit?.toLocaleString()}`, icon: TrendingUp, color: 'text-green-400', bg: 'bg-green-900/30' },
+    { label: 'Active Loads', value: totalLoadsCount.toLocaleString(), icon: Package, color: 'text-amber-300', bg: 'bg-gradient-to-br from-amber-900/40 to-[#1a1d2e]', accent: 'bg-amber-500' },
+    { label: 'Revenue', value: `$${grossRevenueCount.toLocaleString()}`, icon: DollarSign, color: 'text-emerald-300', bg: 'bg-gradient-to-br from-emerald-900/40 to-[#1a1d2e]', accent: 'bg-emerald-500' },
+    { label: 'Miles', value: `${totalMilesCount.toLocaleString()} mi`, icon: Route, color: 'text-blue-300', bg: 'bg-gradient-to-br from-blue-900/40 to-[#1a1d2e]', accent: 'bg-blue-500' },
+    { label: 'Unpaid', value: `$${unpaidCount.toLocaleString()}`, icon: Truck, color: 'text-slate-200', bg: 'bg-gradient-to-br from-slate-800/60 to-[#1a1d2e]', accent: 'bg-slate-400' },
   ]
 
   return (
@@ -30,6 +80,7 @@ export default function Dashboard() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-white">Fleet Dashboard</h1>
+          <p className="text-sm text-slate-400 mt-1">{greeting}</p>
         </div>
         <button onClick={() => setShowAdd(true)} className="flex-shrink-0 flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold px-4 py-2.5 rounded-lg transition-colors">
           <Plus size={16} /> Log a Load
@@ -45,12 +96,15 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map(s => (
-          <div key={s.label} className="bg-[#111827] rounded-xl p-4 border border-[#1f2937]">
-            <div className={`w-9 h-9 ${s.bg} rounded-lg flex items-center justify-center mb-3`}>
-              <s.icon size={18} className={s.color} />
+          <div key={s.label} className={`${s.bg} rounded-xl border border-[#2a3045] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.25)]`}>
+            <div className={`h-1 w-full ${s.accent}`} />
+            <div className="p-4">
+              <div className="w-9 h-9 bg-black/20 rounded-lg flex items-center justify-center mb-3 border border-white/10">
+                <s.icon size={18} className={s.color} />
+              </div>
+              <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
+              <div className="text-xs text-slate-400 mt-0.5">{s.label}</div>
             </div>
-            <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
-            <div className="text-xs text-slate-500 mt-0.5">{s.label}</div>
           </div>
         ))}
       </div>
@@ -77,21 +131,18 @@ export default function Dashboard() {
           <div className="space-y-2">
             {data.recent?.slice(0,6).map(l => (
               <div key={l.id} onClick={() => navigate(`/loads/${l.id}`)}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1f2937] cursor-pointer transition-colors">
-                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{background: STATUS_COLORS[l.status]}} />
+                className="flex items-center gap-3 p-2 rounded-lg transition-all duration-150 hover:bg-[#1e2235] hover:scale-[1.01] cursor-pointer">
+                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{background: (SOURCE_COLORS[l.source] || '#64748b')}} />
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-medium text-white truncate">{l.load_number} · {l.material} · {l.truck_name}</div>
                   <div className="text-[10px] text-slate-500">{l.customer_name}</div>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{background: STATUS_COLORS[l.status]+'22', color: STATUS_COLORS[l.status]}}>
-                  {STATUS_LABELS[l.status]}
-                </span>
+                <LoadStatusBadge status={l.status} />
               </div>
             ))}
           </div>
         </div>
       </div>
-      {/* Source Profitability — the Aggtrans/AggDirect killer */}
       {data.bySource?.length > 0 && (
         <div className="bg-[#111827] rounded-xl border border-[#1f2937] p-4">
           <div className="flex items-center gap-2 mb-4">

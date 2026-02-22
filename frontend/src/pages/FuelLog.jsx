@@ -196,9 +196,16 @@ export default function FuelLog() {
             </thead>
             <tbody>
               {loading && sortedLogs.length === 0 ? (
-                <tr><td colSpan={9} className="px-4 py-8 text-center text-slate-500">Loading fuel logs...</td></tr>
+                <tr><td colSpan={9} className="px-4 py-8 text-center text-slate-500">Loading your fleet data...</td></tr>
               ) : sortedLogs.length === 0 ? (
-                <tr><td colSpan={9} className="px-4 py-8 text-center text-slate-500">No fuel logs yet.</td></tr>
+                <tr>
+                  <td colSpan={9} className="px-4 py-6">
+                    <div className="flex flex-col items-center justify-center py-8 gap-4">
+                      <img src="/empty-fuel.png" alt="" className="w-40 h-40 opacity-90 object-contain" />
+                      <p className="text-slate-400 text-sm font-medium">Tank's empty. Log your first fill-up.</p>
+                    </div>
+                  </td>
+                </tr>
               ) : (
                 sortedLogs.map((log) => (
                   <tr key={log.id} className="border-t border-[#1f2937] text-sm">

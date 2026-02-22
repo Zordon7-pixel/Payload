@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { UserCheck, Phone, CreditCard, AlertTriangle, Plus, X, CheckCircle, DollarSign } from 'lucide-react'
+import { Phone, CreditCard, AlertTriangle, Plus, X, CheckCircle, DollarSign } from 'lucide-react'
 import api from '../lib/api'
 
 const PAY_TYPES = ['percent','per_ton','per_mile','flat_per_load']
@@ -98,8 +98,10 @@ export default function Drivers() {
       {/* Driver List */}
       {drivers.length === 0 ? (
         <div className="bg-[#111827] rounded-xl p-8 text-center border border-[#1f2937]">
-          <UserCheck size={32} className="text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-500 text-sm">No drivers yet. Add your first driver to track pay and compliance.</p>
+          <div className="flex flex-col items-center justify-center py-8 gap-4">
+            <img src="/empty-drivers.png" alt="" className="w-40 h-40 opacity-90 object-contain" />
+            <p className="text-slate-400 text-sm font-medium">No drivers on file yet. Add your team.</p>
+          </div>
         </div>
       ) : (
         <div className="grid gap-4">

@@ -31,7 +31,7 @@ export default function LibraryAutocomplete({
     onChange(v)
     const hits = searchFn(v)
     setResults(hits)
-    setOpen(hits.length > 0)
+    setOpen(v.length > 0)
     setActive(-1)
   }
 
@@ -75,15 +75,17 @@ export default function LibraryAutocomplete({
           <X size={13} />
         </button>
       )}
-      {open && results.length > 0 && (
+      {open && (
         <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-[#1a1d2e] border border-[#2a2d3e] rounded-xl shadow-xl overflow-hidden max-h-72 overflow-y-auto">
-          {results.map((item, i) => (
+          {results.length > 0 ? results.map((item, i) => (
             <button key={i} type="button"
               onMouseDown={() => handleSelect(item)}
               className={`w-full text-left px-3 py-2.5 transition-colors border-b border-[#2a2d3e] last:border-0 ${i === active ? 'bg-indigo-600/30' : 'hover:bg-[#2a2d3e]'}`}>
               {renderItem(item)}
             </button>
-          ))}
+          )) : (
+            <div className="px-3 py-3 text-xs text-slate-400">No loads match that search.</div>
+          )}
           <div className="px-3 py-1.5 text-[9px] text-slate-600 text-right border-t border-[#2a2d3e]">
             Built-in library — start typing to search
           </div>
