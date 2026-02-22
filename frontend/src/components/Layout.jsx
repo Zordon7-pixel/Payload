@@ -27,7 +27,6 @@ export default function Layout() {
             <div className="text-[10px] text-slate-500">Fleet HQ</div>
           </div>
         </div>
-        <div className="text-[9px] text-amber-400 italic mt-2 leading-tight">Every mile tracked. Every dollar earned. Every load delivered.</div>
       </div>
       <nav className="flex-1 p-3 space-y-1">
         {nav.map(({ to, icon: Icon, label }) => (

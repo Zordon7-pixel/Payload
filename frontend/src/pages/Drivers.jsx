@@ -67,7 +67,6 @@ export default function Drivers() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Drivers</h1>
-          <p className="text-xs text-amber-400 italic mt-0.5">Every mile tracked. Every dollar earned. Every load delivered.</p>
         </div>
         <button onClick={() => open(null)} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2.5 rounded-lg text-sm transition-colors">
           <Plus size={15} /> Add Driver
