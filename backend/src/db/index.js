@@ -177,6 +177,25 @@ db.exec(`
   );
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS posttrip_inspections (
+    id               TEXT PRIMARY KEY,
+    company_id       TEXT REFERENCES companies(id),
+    driver_id        TEXT REFERENCES users(id),
+    truck_id         TEXT REFERENCES trucks(id),
+    inspection_date  TEXT NOT NULL,
+    inspection_time  TEXT,
+    odometer         INTEGER,
+    items            TEXT NOT NULL,
+    overall_pass     INTEGER DEFAULT 1,
+    defects_noted    TEXT,
+    driver_signature TEXT,
+    repair_status    TEXT DEFAULT 'none',
+    repair_notes     TEXT,
+    created_at       TEXT DEFAULT (datetime('now'))
+  );
+`);
+
 // Migrations
 const migrations = [
   `ALTER TABLE trucks ADD COLUMN dot_inspection_date TEXT`,

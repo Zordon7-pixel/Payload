@@ -1,10 +1,49 @@
 import { useEffect, useState } from 'react'
 import {
   MapPin, Package, CheckCircle, Truck, Navigation, DollarSign, RefreshCw,
-  ClipboardCheck, XCircle, MinusCircle, AlertTriangle, ChevronDown, ChevronUp, X
+  ClipboardCheck, XCircle, MinusCircle, AlertTriangle, ChevronDown, ChevronUp,
+  ClipboardList, Wrench
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import api from '../lib/api'
+
+// ── Post-Trip Inspection Data ──────────────────────────────────────────────
+const POSTTRIP_GROUPS = [
+  { group:'Body & Exterior',   icon:'🚛', items:[
+    { key:'no_new_damage',    label:'No New Body Damage / Dents' },
+    { key:'lights_intact',    label:'All Lights Intact' },
+    { key:'mirrors_ok',       label:'Mirrors Undamaged' },
+    { key:'windshield_ok',    label:'Windshield Undamaged' },
+  ]},
+  { group:'Mechanical',        icon:'🔧', items:[
+    { key:'no_warning_lights',label:'No Warning Lights On' },
+    { key:'no_unusual_sounds',label:'No Unusual Sounds / Vibrations' },
+    { key:'brakes_ok',        label:'Brakes Felt Normal All Day' },
+    { key:'steering_ok',      label:'Steering Felt Normal' },
+    { key:'transmission_ok',  label:'Transmission / Shifting Normal' },
+  ]},
+  { group:'Tires',             icon:'🔘', items:[
+    { key:'no_blowouts',      label:'No Blowouts or Flats' },
+    { key:'tires_after_run',  label:'Tires Look OK After Run' },
+  ]},
+  { group:'Fluids',            icon:'💧', items:[
+    { key:'no_new_leaks',     label:'No New Leaks Noticed' },
+    { key:'oil_ok_postrun',   label:'Oil Level OK After Run' },
+    { key:'coolant_ok_postrun',label:'No Overheating / Coolant OK' },
+  ]},
+  { group:'Equipment & Cargo', icon:'⛓️', items:[
+    { key:'straps_chains_ok', label:'Straps / Chains / Binders Intact' },
+    { key:'tarps_ok',         label:'Tarps / Covers OK' },
+    { key:'load_area_clear',  label:'Load Area Cleared / Cleaned' },
+  ]},
+  { group:'End of Shift',      icon:'📋', items:[
+    { key:'cab_clean',        label:'Cab Clean & Trash Removed' },
+    { key:'windows_secure',   label:'Windows Closed & Secured' },
+    { key:'fuel_ok',          label:'Fuel Level Noted / Adequate for Tomorrow' },
+  ]},
+]
+const DEFAULT_POSTTRIP_ITEMS = {}
+POSTTRIP_GROUPS.forEach(g => g.items.forEach(i => { DEFAULT_POSTTRIP_ITEMS[i.key] = 'pass' }))
 
 // ── Pre-Trip Inspection Data ───────────────────────────────────────────────
 const INSPECTION_GROUPS = [
@@ -33,6 +72,193 @@ function ItemToggle({ value, onChange }) {
         </button>
       ))}
     </div>
+  )
+}
+
+function PostTripSection() {
+  const [trucks, setTrucks]           = useState([])
+  const [todayInsp, setTodayInsp]     = useState(null)
+  const [loadingInsp, setLoadingInsp] = useState(true)
+  const [saving, setSaving]           = useState(false)
+  const [expanded, setExpanded]       = useState(null)
+  const today = new Date().toISOString().split('T')[0]
+
+  const emptyForm = { truck_id:'', odometer:'', defects_noted:'', driver_signature:'', items:{ ...DEFAULT_POSTTRIP_ITEMS } }
+  const [form, setForm] = useState(emptyForm)
+
+  useEffect(() => {
+    api.get('/trucks').then(r => setTrucks(r.data.trucks || []))
+    api.get('/logbook/posttrip').then(r => {
+      const all = r.data.inspections || []
+      const done = all.find(i => i.inspection_date === today)
+      setTodayInsp(done || null)
+    }).finally(() => setLoadingInsp(false))
+  }, [])
+
+  function setItem(key, val) { setForm(f => ({ ...f, items:{ ...f.items, [key]:val } })) }
+
+  async function submitInsp(e) {
+    e.preventDefault(); setSaving(true)
+    try {
+      await api.post('/logbook/posttrip', { ...form, inspection_date: today })
+      const r = await api.get('/logbook/posttrip')
+      const all = r.data.inspections || []
+      setTodayInsp(all.find(i => i.inspection_date === today) || null)
+      setForm(emptyForm)
+    } finally { setSaving(false) }
+  }
+
+  const failCount = Object.values(form.items).filter(v => v === 'fail').length
+  const inp = 'w-full bg-[#0a0f1e] border border-[#1f2937] rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-500 transition-colors'
+  const lbl = 'block text-xs font-medium text-slate-400 mb-1.5'
+
+  if (loadingInsp) return (
+    <div className="flex items-center justify-center py-16 text-slate-500 text-sm">Loading...</div>
+  )
+
+  // ── Already done today ──────────────────────────────────────────────────
+  if (todayInsp) {
+    const failedItems = Object.entries(todayInsp.items || {}).filter(([,v]) => v === 'fail')
+    const isExpanded = expanded === todayInsp.id
+    const repairBadge = {
+      none:      { label:'All Clear',     cls:'text-emerald-400 bg-emerald-900/20 border-emerald-700/40' },
+      pending:   { label:'Repair Needed', cls:'text-red-400 bg-red-900/20 border-red-700/40' },
+      scheduled: { label:'Repair Scheduled', cls:'text-amber-400 bg-amber-900/20 border-amber-700/40' },
+      repaired:  { label:'Repaired ✓',    cls:'text-emerald-400 bg-emerald-900/20 border-emerald-700/40' },
+    }[todayInsp.repair_status] || { label: todayInsp.repair_status, cls: '' }
+
+    return (
+      <div className="space-y-4">
+        <div className={`bg-[#111827] rounded-2xl border overflow-hidden ${todayInsp.repair_status === 'pending' ? 'border-red-700/50' : 'border-emerald-700/40'}`}>
+          <div className={`px-4 py-3 flex items-center gap-3 ${todayInsp.repair_status === 'pending' ? 'bg-red-900/20' : 'bg-emerald-900/20'}`}>
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center border ${todayInsp.repair_status === 'pending' ? 'text-red-400 bg-red-900/30 border-red-700' : 'text-emerald-400 bg-emerald-900/30 border-emerald-700'}`}>
+              {todayInsp.repair_status === 'pending' ? <Wrench size={18}/> : <CheckCircle size={18}/>}
+            </div>
+            <div className="flex-1">
+              <div className={`font-bold text-sm ${todayInsp.repair_status === 'pending' ? 'text-red-400' : 'text-emerald-400'}`}>
+                {todayInsp.repair_status === 'pending' ? '⚠️ Post-trip filed — repairs needed' : "✓ Today's post-trip complete"}
+              </div>
+              <div className="text-xs text-slate-500">{todayInsp.truck_name} · {todayInsp.truck_plate}</div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${repairBadge.cls}`}>{repairBadge.label}</span>
+              <button onClick={() => setExpanded(isExpanded ? null : todayInsp.id)} className="text-slate-500 hover:text-white">
+                {isExpanded ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
+              </button>
+            </div>
+          </div>
+
+          {isExpanded && (
+            <div className="px-4 pb-4 border-t border-[#1f2937] pt-3 space-y-3">
+              {failedItems.length > 0 && (
+                <div className="bg-red-900/20 border border-red-700/30 rounded-xl p-3">
+                  <div className="text-xs font-semibold text-red-400 mb-1">Issues Reported</div>
+                  {failedItems.map(([key]) => {
+                    const item = POSTTRIP_GROUPS.flatMap(g=>g.items).find(i=>i.key===key)
+                    return <div key={key} className="text-xs text-red-300">• {item?.label || key}</div>
+                  })}
+                </div>
+              )}
+              {todayInsp.defects_noted && (
+                <div><div className="text-xs text-slate-500 mb-1">Driver Notes</div><p className="text-xs text-slate-300">{todayInsp.defects_noted}</p></div>
+              )}
+              {todayInsp.repair_notes && (
+                <div className="bg-amber-900/20 border border-amber-700/30 rounded-xl p-3">
+                  <div className="text-xs font-semibold text-amber-400 mb-1">Repair Notes from Owner</div>
+                  <p className="text-xs text-amber-300">{todayInsp.repair_notes}</p>
+                </div>
+              )}
+              <div className="text-xs text-slate-500">Signed: <span className="text-white">{todayInsp.driver_signature}</span></div>
+              {todayInsp.odometer && <div className="text-xs text-slate-500">End Odometer: <span className="text-white">{parseInt(todayInsp.odometer).toLocaleString()} mi</span></div>}
+            </div>
+          )}
+        </div>
+        <p className="text-center text-xs text-slate-600">Post-trip is once per day. Come back tomorrow.</p>
+      </div>
+    )
+  }
+
+  // ── Form ────────────────────────────────────────────────────────────────
+  return (
+    <form onSubmit={submitInsp} className="space-y-4">
+      <div className="bg-[#111827] rounded-2xl border border-amber-500/30 p-5">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-amber-900/30 border border-amber-700/50 flex items-center justify-center">
+            <ClipboardList size={20} className="text-amber-400"/>
+          </div>
+          <div>
+            <div className="font-bold text-white">Post-Trip Inspection</div>
+            <div className="text-xs text-slate-500">End of shift · {new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="col-span-2">
+            <label className={lbl}>Vehicle *</label>
+            <select className={inp} required value={form.truck_id} onChange={e=>setForm(f=>({...f,truck_id:e.target.value}))}>
+              <option value="">— select truck —</option>
+              {trucks.map(t=><option key={t.id} value={t.id}>{t.name} · {t.plate} ({t.year} {t.make} {t.model})</option>)}
+            </select>
+          </div>
+          <div>
+            <label className={lbl}>End Odometer</label>
+            <input type="number" className={inp} value={form.odometer} onChange={e=>setForm(f=>({...f,odometer:e.target.value}))} placeholder="Ending mileage"/>
+          </div>
+          <div className="flex items-end pb-1">
+            <div className="text-xs text-slate-500">
+              Time: <span className="text-white">{new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</span>
+            </div>
+          </div>
+        </div>
+
+        {failCount > 0 && (
+          <div className="mt-3 bg-red-900/20 border border-red-700/40 rounded-xl px-4 py-2 flex items-center gap-2">
+            <AlertTriangle size={14} className="text-red-400 flex-shrink-0"/>
+            <span className="text-xs text-red-400 font-semibold">
+              {failCount} issue{failCount>1?'s':''} flagged — your owner will be notified to schedule repairs.
+            </span>
+          </div>
+        )}
+      </div>
+
+      {POSTTRIP_GROUPS.map(group => (
+        <div key={group.group} className="bg-[#111827] rounded-2xl border border-[#1f2937] p-4">
+          <h4 className="text-sm font-bold text-white mb-3">{group.icon} {group.group}</h4>
+          <div className="space-y-3">
+            {group.items.map(item => (
+              <div key={item.key} className="flex items-center justify-between gap-3">
+                <span className="text-sm text-slate-300 flex-1">{item.label}</span>
+                <ItemToggle value={form.items[item.key]} onChange={val => setItem(item.key, val)}/>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <div className="bg-[#111827] rounded-2xl border border-[#1f2937] p-5 space-y-3">
+        <div>
+          <label className={lbl}>Issues / Notes (describe anything that needs attention)</label>
+          <textarea className={`${inp} resize-none`} rows={3}
+            value={form.defects_noted}
+            onChange={e=>setForm(f=>({...f,defects_noted:e.target.value}))}
+            placeholder="Describe any issues, damage, or concerns from today's run..."/>
+        </div>
+        <div>
+          <label className={lbl}>Driver Signature (full name) *</label>
+          <input className={inp} required value={form.driver_signature}
+            onChange={e=>setForm(f=>({...f,driver_signature:e.target.value}))}
+            placeholder="Type your full name to certify this report"/>
+        </div>
+        <p className="text-[10px] text-slate-500 italic">
+          By signing, I certify this vehicle was inspected at end of shift and all issues have been reported above.
+        </p>
+        <button type="submit"
+          disabled={saving || !form.truck_id || !form.driver_signature}
+          className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-4 rounded-xl text-sm disabled:opacity-50 transition-colors">
+          {saving ? 'Submitting...' : failCount > 0 ? `⚠️ Submit — ${failCount} Issue${failCount>1?'s':''} Flagged` : '✓ Submit Post-Trip Report'}
+        </button>
+      </div>
+    </form>
   )
 }
 
@@ -367,27 +593,36 @@ export default function MyLoads() {
         <div className="flex gap-1">
           <button
             onClick={() => setTab('pretrip')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold border-b-2 transition-colors ${
               tab === 'pretrip'
                 ? 'border-amber-500 text-amber-400'
                 : 'border-transparent text-slate-500 hover:text-slate-300'
             }`}>
-            <ClipboardCheck size={15}/> Pre-Trip
+            <ClipboardCheck size={13}/> Pre-Trip
           </button>
           <button
             onClick={() => setTab('loads')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold border-b-2 transition-colors ${
               tab === 'loads'
                 ? 'border-amber-500 text-amber-400'
                 : 'border-transparent text-slate-500 hover:text-slate-300'
             }`}>
-            <Truck size={15}/>
+            <Truck size={13}/>
             My Loads
             {active.length > 0 && (
               <span className="bg-amber-500 text-black text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                 {active.length}
               </span>
             )}
+          </button>
+          <button
+            onClick={() => setTab('posttrip')}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold border-b-2 transition-colors ${
+              tab === 'posttrip'
+                ? 'border-amber-500 text-amber-400'
+                : 'border-transparent text-slate-500 hover:text-slate-300'
+            }`}>
+            <ClipboardList size={13}/> Post-Trip
           </button>
         </div>
       </div>
@@ -396,6 +631,9 @@ export default function MyLoads() {
 
         {/* ── PRE-TRIP TAB ── */}
         {tab === 'pretrip' && <PreTripSection/>}
+
+        {/* ── POST-TRIP TAB ── */}
+        {tab === 'posttrip' && <PostTripSection/>}
 
         {/* ── MY LOADS TAB ── */}
         {tab === 'loads' && (
