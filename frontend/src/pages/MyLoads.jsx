@@ -110,7 +110,14 @@ function LoadCard({ load, onUpdate }) {
   )
 }
 
-const MATERIAL_EMOJI = { asphalt:'🛣️', gravel:'🪨', sand:'🏜️', salt:'🧂', dirt:'🌱', mulch:'🌿', topsoil:'🌍', concrete:'🏗️' }
+const MATERIAL_EMOJI = {
+  'General Freight':'📦', 'Auto Parts':'🔧', 'Building Materials':'🏗️', 'Electronics':'💻',
+  'Food & Beverage':'🥡', 'Furniture / Household':'🛋️', 'Hazmat':'⚠️', 'Heavy Equipment':'⚙️',
+  'Lumber':'🪵', 'Machinery':'🏭', 'Oversized / Wide Load':'📐', 'Palletized Goods':'📦',
+  'Refrigerated / Reefer':'❄️', 'Steel / Metal':'🔩', 'Other':'🚛',
+  // legacy fallback keys
+  asphalt:'🛣️', gravel:'🪨', sand:'🏜️', salt:'🧂', dirt:'🌱', topsoil:'🌍', concrete:'🏗️',
+}
 
 export default function MyLoads() {
   const [loads, setLoads]   = useState([])

@@ -7,7 +7,7 @@ if (existing) { console.log('DB already seeded.'); process.exit(0); }
 
 const companyId = uuidv4();
 db.prepare(`INSERT INTO companies (id, name, mc_number, dot_number, address, phone) VALUES (?, ?, ?, ?, ?, ?)`).run(
-  companyId, "PAYLOAD Demo Hauling LLC", "MC-1234567", "DOT-9876543", "123 Commerce Blvd", "(555) 800-0100"
+  companyId, "PAYLOAD Demo Transport LLC", "MC-7654321", "DOT-1234567", "100 Freight Way", "(555) 900-0200"
 );
 
 const userId = uuidv4();
@@ -16,8 +16,8 @@ db.prepare(`INSERT INTO users (id, company_id, name, email, password_hash, role)
 );
 
 const trucks = [
-  { name: "Truck 1", year: 2020, make: "Mack", model: "Granite", plate: "TRK-0011" },
-  { name: "Truck 2", year: 2019, make: "Kenworth", model: "T370", plate: "TRK-0022" },
+  { name: "Truck 1", year: 2021, make: "Freightliner", model: "Cascadia", plate: "TRK-1001" },
+  { name: "Truck 2", year: 2020, make: "Kenworth",     model: "T680",     plate: "TRK-1002" },
 ];
 const truckIds = trucks.map(t => {
   const id = uuidv4();
@@ -25,51 +25,51 @@ const truckIds = trucks.map(t => {
   return id;
 });
 
-const customers = [
-  { name: "Coastal Paving Co.",    contact: "Mike Torres",  source: "aggtrans" },
-  { name: "Midland Road Works",    contact: "Sandra Lee",   source: "aggdirect" },
-  { name: "National Salt Dist.",   contact: "James Wu",     source: "direct" },
-  { name: "Riverside Contractors", contact: "Dana Price",   source: "direct" },
-];
-const custIds = customers.map(c => {
-  const id = uuidv4();
-  db.prepare(`INSERT INTO customers (id, company_id, name, contact_name, source) VALUES (?, ?, ?, ?, ?)`).run(id, companyId, c.name, c.contact, c.source);
-  return id;
-});
+const cust0 = uuidv4(); db.prepare(`INSERT INTO customers (id, company_id, name, contact_name, source) VALUES (?, ?, ?, ?, ?)`).run(cust0, companyId, "Heartland Foods Co.",      "Maria Gonzalez", "direct");
+const cust1 = uuidv4(); db.prepare(`INSERT INTO customers (id, company_id, name, contact_name, source) VALUES (?, ?, ?, ?, ?)`).run(cust1, companyId, "National Parts Depot",     "Eric Thompson",  "dat");
+const cust2 = uuidv4(); db.prepare(`INSERT INTO customers (id, company_id, name, contact_name, source) VALUES (?, ?, ?, ?, ?)`).run(cust2, companyId, "Summit Retail Group",      "Ashley Kim",     "truckstop");
+const cust3 = uuidv4(); db.prepare(`INSERT INTO customers (id, company_id, name, contact_name, source) VALUES (?, ?, ?, ?, ?)`).run(cust3, companyId, "Atlas Building Materials", "Dan Fisher",     "broker");
 
+// rate_type: per_mile | flat_rate | per_ton
+// material field stores the freight/cargo type description
 const loads = [
-  // delivered + paid — shows in revenue
-  { truckId: truckIds[0], custId: custIds[0], material: "asphalt",  pickup: "Asphalt Plant, OH",   dropoff: "Columbus, OH",    tons: 22, miles: 45, rate_per_ton: 22, status: "delivered", source: "aggtrans",  paid: 1, pickupDate: "2026-02-10", delivDate: "2026-02-11" },
-  // delivered + UNPAID — shows in unpaid invoices
-  { truckId: truckIds[1], custId: custIds[1], material: "gravel",   pickup: "Stone Quarry, PA",    dropoff: "Pittsburgh, PA",  tons: 18, miles: 28, rate_per_ton: 18, status: "delivered", source: "aggdirect", paid: 0, pickupDate: "2026-02-11", delivDate: "2026-02-12" },
-  // in transit
-  { truckId: truckIds[0], custId: custIds[2], material: "salt",     pickup: "Salt Depot, IL",      dropoff: "Chicago, IL",     tons: 25, miles: 52, rate_per_ton: 20, status: "in_transit",source: "direct",    paid: 0, pickupDate: "2026-02-12", delivDate: null },
-  // loaded (staged)
-  { truckId: truckIds[1], custId: custIds[0], material: "sand",     pickup: "Sand Pit, TX",        dropoff: "Houston, TX",     tons: 20, miles: 22, rate_per_ton: 16, status: "loaded",    source: "aggtrans",  paid: 0, pickupDate: "2026-02-13", delivDate: null },
-  // pending dispatch
-  { truckId: truckIds[0], custId: custIds[3], material: "asphalt",  pickup: "Asphalt Plant, GA",   dropoff: "Atlanta, GA",     tons: 24, miles: 30, rate_per_ton: 24, status: "pending",   source: "direct",    paid: 0, pickupDate: "2026-02-14", delivDate: null },
-  // delivered + UNPAID — second outstanding invoice
-  { truckId: truckIds[1], custId: custIds[2], material: "topsoil",  pickup: "Farm Supply, IN",     dropoff: "Indianapolis, IN",tons: 15, miles: 20, rate_per_ton: 19, status: "delivered", source: "direct",    paid: 0, pickupDate: "2026-02-15", delivDate: "2026-02-16" },
+  // 1. delivered + PAID — per-mile dry van
+  { truck: truckIds[0], cust: cust0, freight: "Packaged Food",            pickup: "Kansas City, MO", dropoff: "Nashville, TN",  miles: 530, rpm: 2.20, type: "per_mile", flat: 0, tons: 0, rpt: 0, fuel: 265, dpay: 160, status: "delivered", source: "direct",    paid: 1, pd: "2026-02-08", dd: "2026-02-09" },
+  // 2. delivered + UNPAID — flat rate flatbed
+  { truck: truckIds[1], cust: cust3, freight: "Steel Beams",              pickup: "Cincinnati, OH",  dropoff: "Charlotte, NC",  miles: 490, rpm: 0,    type: "flat_rate", flat: 1800, tons: 0, rpt: 0, fuel: 245, dpay: 400, status: "delivered", source: "broker",    paid: 0, pd: "2026-02-11", dd: "2026-02-12" },
+  // 3. in transit — per mile
+  { truck: truckIds[0], cust: cust1, freight: "Auto Parts",               pickup: "Detroit, MI",     dropoff: "Memphis, TN",    miles: 620, rpm: 2.10, type: "per_mile", flat: 0, tons: 0, rpt: 0, fuel: 310, dpay: 185, status: "in_transit", source: "dat",       paid: 0, pd: "2026-02-14", dd: null },
+  // 4. loaded — flatbed (oversized)
+  { truck: truckIds[1], cust: cust3, freight: "Lumber / Building Materials", pickup: "Portland, OR", dropoff: "Boise, ID",      miles: 320, rpm: 0,    type: "flat_rate", flat: 1200, tons: 0, rpt: 0, fuel: 160, dpay: 280, status: "loaded",    source: "broker",    paid: 0, pd: "2026-02-15", dd: null },
+  // 5. pending dispatch — per mile
+  { truck: truckIds[0], cust: cust2, freight: "General Retail Freight",   pickup: "Columbus, OH",    dropoff: "Atlanta, GA",    miles: 700, rpm: 2.30, type: "per_mile", flat: 0, tons: 0, rpt: 0, fuel: 350, dpay: 210, status: "pending",   source: "truckstop", paid: 0, pd: "2026-02-17", dd: null },
+  // 6. delivered + UNPAID — per mile electronics run
+  { truck: truckIds[1], cust: cust1, freight: "Electronics / Palletized", pickup: "Dallas, TX",      dropoff: "Phoenix, AZ",    miles: 1020, rpm: 2.50, type: "per_mile", flat: 0, tons: 0, rpt: 0, fuel: 510, dpay: 306, status: "delivered", source: "dat",       paid: 0, pd: "2026-02-13", dd: "2026-02-15" },
 ];
 
 loads.forEach((l, i) => {
   const id = uuidv4();
   const loadNum = `HC-2026-${String(i+1).padStart(4,'0')}`;
-  const gross = l.tons * l.rate_per_ton;
-  const fuel  = +(l.miles * 0.45).toFixed(2);
-  const net   = +(gross - fuel - (gross * 0.15)).toFixed(2);
+  let gross = 0;
+  if (l.type === 'per_mile')  gross = l.miles * l.rpm;
+  else if (l.type === 'flat_rate') gross = l.flat;
+  else gross = l.tons * l.rpt;
+  const net = +(gross - l.fuel - l.dpay).toFixed(2);
   db.prepare(`
     INSERT INTO loads (id, company_id, load_number, truck_id, driver_id, customer_id, source, material,
-      pickup_location, dropoff_location, status, tons, miles, rate_per_ton, rate_type,
-      gross_revenue, fuel_cost, net_profit, paid, pickup_date, delivery_date)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'per_ton', ?, ?, ?, ?, ?, ?)
-  `).run(id, companyId, loadNum, l.truckId, userId, l.custId, l.source, l.material,
-    l.pickup, l.dropoff, l.status, l.tons, l.miles, l.rate_per_ton,
-    gross, fuel, net, l.paid ? 1 : 0, l.pickupDate, l.delivDate
+      pickup_location, dropoff_location, status, tons, miles, rate_per_ton, rate_per_mile, flat_rate, rate_type,
+      gross_revenue, fuel_cost, driver_pay, net_profit, paid, pickup_date, delivery_date)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    id, companyId, loadNum, l.truck, userId, l.cust, l.source, l.freight,
+    l.pickup, l.dropoff, l.status, l.tons, l.miles, l.rpt, l.rpm, l.flat, l.type,
+    gross, l.fuel, l.dpay, net, l.paid ? 1 : 0, l.pd, l.dd
   );
 });
 
 console.log('✅ PAYLOAD seeded.');
-console.log('   Company: PAYLOAD Demo Hauling LLC');
+console.log('   Company: PAYLOAD Demo Transport LLC');
 console.log('   Login: demo@haul.com / demo1234');
-console.log('   2 trucks | 4 customers | 6 loads (2 delivered+unpaid, 1 paid, 3 active)');
+console.log('   2 trucks (Freightliner Cascadia + Kenworth T680)');
+console.log('   4 customers | 6 loads (2 delivered+unpaid, 1 paid, 3 active)');
+console.log('   Rate types: per_mile + flat_rate');

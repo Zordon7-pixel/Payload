@@ -70,15 +70,15 @@ export default function LoadDetail() {
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Load Details</h2>
           <div className="space-y-2">
             {[
-              ['Material', load.material?.toUpperCase()],
+              ['Freight Type', load.material],
               ['From', load.pickup_location],
               ['To', load.dropoff_location],
-              ['Tons', `${load.tons} tons`],
-              ['Miles', `${load.miles} mi`],
+              load.tons > 0 ? ['Weight', `${load.tons} tons`] : null,
+              load.miles > 0 ? ['Miles', `${load.miles} mi`] : null,
               ['Source', load.source],
               ['Pickup Date', load.pickup_date],
               ['Delivered', load.delivery_date || '—'],
-            ].map(([k,v]) => (
+            ].filter(Boolean).map(([k,v]) => (
               <div key={k} className="flex justify-between text-xs">
                 <span className="text-slate-500">{k}</span>
                 <span className="text-white font-medium capitalize">{v || '—'}</span>
@@ -91,13 +91,15 @@ export default function LoadDetail() {
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">💰 Financials</h2>
           <div className="space-y-2">
             {[
-              ['Rate Type', load.rate_type],
-              ['Rate / Ton', load.rate_per_ton ? `$${load.rate_per_ton}` : '—'],
+              ['Rate Type', ({ per_mile:'Per Mile', flat_rate:'Flat Rate', per_ton:'Per Ton' })[load.rate_type] || load.rate_type],
+              load.rate_type === 'per_mile'  ? ['Rate / Mile', load.rate_per_mile ? `$${load.rate_per_mile}` : '—'] : null,
+              load.rate_type === 'flat_rate' ? ['Flat Rate',   load.flat_rate    ? `$${load.flat_rate}` : '—'] : null,
+              load.rate_type === 'per_ton'   ? ['Rate / Ton',  load.rate_per_ton ? `$${load.rate_per_ton}` : '—'] : null,
               ['Gross Revenue', `$${gross.toFixed(2)}`],
               ['Fuel Cost', `-$${parseFloat(load.fuel_cost||0).toFixed(2)}`],
               ['Driver Pay', `-$${parseFloat(load.driver_pay||0).toFixed(2)}`],
               ['Other Expenses', `-$${parseFloat(load.other_expenses||0).toFixed(2)}`],
-            ].map(([k,v]) => (
+            ].filter(Boolean).map(([k,v]) => (
               <div key={k} className="flex justify-between text-xs">
                 <span className="text-slate-500">{k}</span>
                 <span className={`font-medium ${v?.startsWith('-') ? 'text-red-400' : 'text-white'}`}>{v}</span>

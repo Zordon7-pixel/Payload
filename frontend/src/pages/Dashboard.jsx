@@ -4,8 +4,8 @@ import { Truck, Package, DollarSign, TrendingUp, AlertCircle, Plus, BarChart2 } 
 import api from '../lib/api'
 import AddLoadModal from '../components/AddLoadModal'
 
-const SOURCE_LABELS = { aggtrans:'Aggtrans', aggdirect:'AggDirect', direct:'Direct', loadboard:'Load Board', other:'Other' }
-const SOURCE_COLORS = { aggtrans:'#f97316', aggdirect:'#3b82f6', direct:'#22c55e', loadboard:'#a855f7', other:'#64748b' }
+const SOURCE_LABELS = { direct:'Direct', dat:'DAT', truckstop:'Truckstop.com', broker:'Broker', aggtrans:'Aggtrans', aggdirect:'AggDirect', other:'Other' }
+const SOURCE_COLORS = { direct:'#22c55e', dat:'#f97316', truckstop:'#3b82f6', broker:'#a855f7', aggtrans:'#f59e0b', aggdirect:'#06b6d4', other:'#64748b' }
 
 const STATUS_COLORS = { pending:'#64748b', dispatched:'#3b82f6', loaded:'#f97316', in_transit:'#eab308', delivered:'#10b981', invoiced:'#a855f7', paid:'#22c55e' }
 const STATUS_LABELS = { pending:'Pending', dispatched:'Dispatched', loaded:'Loaded', in_transit:'In Transit', delivered:'Delivered', invoiced:'Invoiced', paid:'Paid' }

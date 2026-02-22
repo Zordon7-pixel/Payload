@@ -7,7 +7,12 @@ import AddLoadModal from '../components/AddLoadModal'
 export const STATUS_COLORS = { pending:'#64748b', dispatched:'#3b82f6', loaded:'#f97316', in_transit:'#eab308', delivered:'#10b981', invoiced:'#a855f7', paid:'#22c55e' }
 export const STATUS_LABELS = { pending:'Pending', dispatched:'Dispatched', loaded:'Loaded', in_transit:'In Transit', delivered:'Delivered', invoiced:'Invoiced', paid:'Paid' }
 const STAGES = ['pending','dispatched','loaded','in_transit','delivered','invoiced','paid']
-const MATERIAL_ICONS = { salt:'🧂', sand:'🏜️', gravel:'🪨', asphalt:'🛣️', dirt:'🌱', mulch:'🌿' }
+const MATERIAL_ICONS = {
+  'General Freight':'📦', 'Auto Parts':'🔧', 'Building Materials':'🏗️', 'Electronics':'💻',
+  'Food & Beverage':'🥡', 'Furniture / Household':'🛋️', 'Hazmat':'⚠️', 'Heavy Equipment':'⚙️',
+  'Lumber':'🪵', 'Machinery':'🏭', 'Oversized / Wide Load':'📐', 'Palletized Goods':'📦',
+  'Refrigerated / Reefer':'❄️', 'Steel / Metal':'🔩', 'Other':'🚛',
+}
 
 export default function Loads() {
   const [loads, setLoads] = useState([])
@@ -60,7 +65,7 @@ export default function Loads() {
                     </div>
                     <div className="text-sm font-bold text-white capitalize">{l.material}</div>
                     <div className="text-xs text-slate-300 truncate">{l.customer_name}</div>
-                    <div className="text-[10px] text-slate-500 mt-1">{l.truck_name} · {l.tons}t · {l.miles}mi</div>
+                    <div className="text-[10px] text-slate-500 mt-1">{l.truck_name}{l.miles > 0 ? ` · ${l.miles}mi` : ''}</div>
                     <div className="flex items-center justify-between mt-1.5">
                       <span className="text-sm font-bold text-amber-400">${parseFloat(l.gross_revenue||0).toFixed(0)}</span>
                       {l.paid ? <span className="text-[9px] bg-emerald-900/40 text-emerald-400 px-1.5 py-0.5 rounded-full font-bold">PAID</span>
