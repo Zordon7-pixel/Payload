@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import api from '../lib/api'
+import LibraryAutocomplete from './LibraryAutocomplete'
+import { searchCompanies } from '../data/companies'
 
 const FREIGHT_TYPES = [
   'General Freight',
@@ -140,8 +142,24 @@ export default function AddLoadModal({ onClose, onSaved }) {
                   <option value="">— select —</option>
                   {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
-              : <div className="grid grid-cols-2 gap-2">
-                  <input className={inp} placeholder="Company name" value={form.customer_name} onChange={e => set('customer_name', e.target.value)} />
+              : <div className="space-y-2">
+                  <LibraryAutocomplete
+                    value={form.customer_name}
+                    onChange={v => set('customer_name', v)}
+                    onSelect={co => {
+                      set('customer_name', co.name)
+                      if (co.phone) set('customer_phone', co.phone)
+                      if (co.source) set('source', co.source)
+                    }}
+                    searchFn={searchCompanies}
+                    placeholder="C.H. Robinson, Amazon, Coyote..."
+                    renderItem={co => (
+                      <div>
+                        <div className="text-xs text-white font-medium">{co.name}</div>
+                        <div className="text-[10px] text-amber-400">{co.type}{co.phone ? ` · ${co.phone}` : ''}</div>
+                      </div>
+                    )}
+                  />
                   <input className={inp} placeholder="Phone" value={form.customer_phone} onChange={e => set('customer_phone', e.target.value)} />
                 </div>
             }
