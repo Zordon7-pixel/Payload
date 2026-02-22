@@ -68,7 +68,7 @@ export default function AddLoadModal({ onClose, onSaved }) {
                 {SOURCES.map(s => <option key={s}>{s}</option>)}
               </select></div>
           </div>
-          <div><label className={lbl}>Source Ref # (Aggtrans/AggDirect load ID)</label>
+          <div><label className={lbl}>Source Ref # (Load Board ID)</label>
             <input className={inp} value={form.source_ref} onChange={e => set('source_ref', e.target.value)} placeholder="Load ID from platform" /></div>
           <div><label className={lbl}>Customer</label>
             <div className="flex gap-2 mb-2">
@@ -91,8 +91,8 @@ export default function AddLoadModal({ onClose, onSaved }) {
               {MATERIALS.map(m => <option key={m}>{m}</option>)}
             </select></div>
           <div className="grid grid-cols-2 gap-3">
-            <div><label className={lbl}>Pickup Location</label><input className={inp} value={form.pickup_location} onChange={e => set('pickup_location', e.target.value)} placeholder="Baltimore, MD" /></div>
-            <div><label className={lbl}>Drop-off Location</label><input className={inp} value={form.dropoff_location} onChange={e => set('dropoff_location', e.target.value)} placeholder="Washington, DC" /></div>
+            <div><label className={lbl}>Pickup Location</label><input className={inp} value={form.pickup_location} onChange={e => set('pickup_location', e.target.value)} placeholder="City, State" /></div>
+            <div><label className={lbl}>Drop-off Location</label><input className={inp} value={form.dropoff_location} onChange={e => set('dropoff_location', e.target.value)} placeholder="City, State" /></div>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div><label className={lbl}>Tons</label><input className={inp} type="number" value={form.tons} onChange={e => set('tons', e.target.value)} placeholder="22" /></div>
