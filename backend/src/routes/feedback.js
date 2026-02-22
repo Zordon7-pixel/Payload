@@ -8,7 +8,9 @@ db.exec(`
     app TEXT DEFAULT 'haulcommand',
     tester_name TEXT,
     category TEXT,
+    priority TEXT DEFAULT 'medium',
     message TEXT NOT NULL,
+    expected TEXT,
     page TEXT,
     status TEXT DEFAULT 'new',
     routed_to TEXT,
@@ -17,11 +19,11 @@ db.exec(`
 `);
 
 router.post('/', (req, res) => {
-  const { tester_name, category, message, page } = req.body;
+  const { tester_name, category, priority, message, expected, page, routed_to } = req.body;
   if (!message?.trim()) return res.status(400).json({ error: 'Message required' });
   const id = uuidv4();
-  db.prepare(`INSERT INTO feedback (id, app, tester_name, category, message, page) VALUES (?, 'haulcommand', ?, ?, ?, ?)`)
-    .run(id, tester_name || 'Anonymous', category || 'general', message.trim(), page || null);
+  db.prepare(`INSERT INTO feedback (id, app, tester_name, category, priority, message, expected, page, routed_to) VALUES (?, 'haulcommand', ?, ?, ?, ?, ?, ?, ?)`)
+    .run(id, tester_name || 'Anonymous', category || 'general', priority || 'medium', message.trim(), expected || null, page || null, routed_to || null);
   res.status(201).json({ ok: true, id });
 });
 
