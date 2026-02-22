@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, FileText } from 'lucide-react'
 import api from '../lib/api'
 import { STATUS_COLORS, STATUS_LABELS } from './Loads'
 
@@ -43,6 +43,12 @@ export default function LoadDetail() {
           {currentIdx < STAGES.length - 1 && (
             <button onClick={advance} className="flex items-center gap-1 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">
               → {STATUS_LABELS[STAGES[currentIdx + 1]]}
+            </button>
+          )}
+          {['delivered','invoiced','paid'].includes(load.status) && (
+            <button onClick={() => navigate(`/invoice/${load.id}`)}
+              className="flex items-center gap-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">
+              <FileText size={12}/> Invoice
             </button>
           )}
           {!load.paid && ['delivered','invoiced'].includes(load.status) && (

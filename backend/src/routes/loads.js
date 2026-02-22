@@ -101,6 +101,16 @@ router.put('/:id/status', auth, (req, res) => {
   res.json(enrichLoad(db.prepare('SELECT * FROM loads WHERE id = ?').get(req.params.id)));
 });
 
+// GET invoice data — returns load + company info, marks invoice_sent = 1
+router.get('/:id/invoice', auth, (req, res) => {
+  const load = db.prepare('SELECT * FROM loads WHERE id = ? AND company_id = ?').get(req.params.id, req.user.company_id);
+  if (!load) return res.status(404).json({ error: 'Not found' });
+  const company = db.prepare('SELECT * FROM companies WHERE id = ?').get(req.user.company_id);
+  // Mark invoice as sent
+  db.prepare('UPDATE loads SET invoice_sent = 1, updated_at = ? WHERE id = ?').run(new Date().toISOString(), req.params.id);
+  res.json({ load: enrichLoad(load), company });
+});
+
 router.delete('/:id', auth, (req, res) => {
   db.prepare('DELETE FROM loads WHERE id = ? AND company_id = ?').run(req.params.id, req.user.company_id);
   res.json({ ok: true });
