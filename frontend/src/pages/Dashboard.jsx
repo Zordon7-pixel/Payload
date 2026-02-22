@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Truck, Package, DollarSign, TrendingUp, AlertCircle } from 'lucide-react'
+import { Truck, Package, DollarSign, TrendingUp, AlertCircle, Plus } from 'lucide-react'
 import api from '../lib/api'
+import AddLoadModal from '../components/AddLoadModal'
 
 const STATUS_COLORS = { pending:'#64748b', dispatched:'#3b82f6', loaded:'#f97316', in_transit:'#eab308', delivered:'#10b981', invoiced:'#a855f7', paid:'#22c55e' }
 const STATUS_LABELS = { pending:'Pending', dispatched:'Dispatched', loaded:'Loaded', in_transit:'In Transit', delivered:'Delivered', invoiced:'Invoiced', paid:'Paid' }
 
 export default function Dashboard() {
   const [data, setData] = useState(null)
+  const [showAdd, setShowAdd] = useState(false)
   const navigate = useNavigate()
-  useEffect(() => { api.get('/reports/summary').then(r => setData(r.data)) }, [])
+  const load = () => api.get('/reports/summary').then(r => setData(r.data))
+  useEffect(() => { load() }, [])
   if (!data) return <div className="flex items-center justify-center h-64 text-slate-500">Loading...</div>
 
   const stats = [
@@ -21,9 +24,14 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold text-white">Fleet Dashboard</h1>
-        <p className="text-slate-500 text-sm">PAYLOAD — DMV Area Operations</p>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-bold text-white">Fleet Dashboard</h1>
+          <p className="text-slate-500 text-sm">PAYLOAD — DMV Area Operations</p>
+        </div>
+        <button onClick={() => setShowAdd(true)} className="flex-shrink-0 flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold px-4 py-2.5 rounded-lg transition-colors">
+          <Plus size={16} /> Log a Load
+        </button>
       </div>
 
       {data.unpaid?.n > 0 && (
@@ -81,6 +89,7 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      {showAdd && <AddLoadModal onClose={() => setShowAdd(false)} onSaved={() => { setShowAdd(false); load() }} />}
     </div>
   )
 }

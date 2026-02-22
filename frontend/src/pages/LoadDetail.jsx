@@ -36,13 +36,19 @@ export default function LoadDetail() {
           <h1 className="text-xl font-bold text-white">{load.load_number}</h1>
           <p className="text-slate-500 text-sm capitalize">{load.material} · {load.truck?.name} · {load.customer?.name}</p>
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-2 flex-wrap">
           <span className="text-xs px-3 py-1.5 rounded-full font-bold uppercase" style={{background: STATUS_COLORS[load.status]+'22', color: STATUS_COLORS[load.status]}}>
             {STATUS_LABELS[load.status]}
           </span>
           {currentIdx < STAGES.length - 1 && (
             <button onClick={advance} className="flex items-center gap-1 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">
               → {STATUS_LABELS[STAGES[currentIdx + 1]]}
+            </button>
+          )}
+          {!load.paid && ['delivered','invoiced'].includes(load.status) && (
+            <button onClick={async () => { await api.put(`/loads/${load.id}`, { paid: 1 }); fetch() }}
+              className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">
+              ✓ Mark Paid
             </button>
           )}
         </div>

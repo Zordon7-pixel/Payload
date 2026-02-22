@@ -37,11 +37,11 @@ const custIds = customers.map(c => {
 });
 
 const loads = [
-  { truckId: truckIds[0], custId: custIds[0], material: "asphalt", pickup: "Baltimore, MD", dropoff: "Washington, DC", tons: 22, miles: 45, rate_per_ton: 12, status: "delivered", source: "aggtrans", paid: 1 },
-  { truckId: truckIds[1], custId: custIds[1], material: "gravel", pickup: "Quarry, VA", dropoff: "Arlington, VA", tons: 18, miles: 28, rate_per_ton: 10, status: "in_transit", source: "aggdirect", paid: 0 },
-  { truckId: truckIds[0], custId: custIds[2], material: "salt", pickup: "Port of Baltimore", dropoff: "Fairfax, VA", tons: 25, miles: 52, rate_per_ton: 11, status: "loaded", source: "direct", paid: 0 },
-  { truckId: truckIds[1], custId: custIds[0], material: "sand", pickup: "Sand Pit, MD", dropoff: "Bethesda, MD", tons: 20, miles: 22, rate_per_ton: 9, status: "pending", source: "aggtrans", paid: 0 },
-  { truckId: truckIds[0], custId: custIds[1], material: "asphalt", pickup: "Plant, MD", dropoff: "Silver Spring, MD", tons: 24, miles: 30, rate_per_ton: 13, status: "delivered", source: "aggdirect", paid: 1 },
+  { truckId: truckIds[0], custId: custIds[0], material: "asphalt", pickup: "Baltimore, MD", dropoff: "Washington, DC", tons: 22, miles: 45, rate_per_ton: 22, status: "delivered", source: "aggtrans", paid: 1 },
+  { truckId: truckIds[1], custId: custIds[1], material: "gravel", pickup: "Quarry, VA", dropoff: "Arlington, VA", tons: 18, miles: 28, rate_per_ton: 18, status: "in_transit", source: "aggdirect", paid: 0 },
+  { truckId: truckIds[0], custId: custIds[2], material: "salt", pickup: "Port of Baltimore", dropoff: "Fairfax, VA", tons: 25, miles: 52, rate_per_ton: 20, status: "loaded", source: "direct", paid: 0 },
+  { truckId: truckIds[1], custId: custIds[0], material: "sand", pickup: "Sand Pit, MD", dropoff: "Bethesda, MD", tons: 20, miles: 22, rate_per_ton: 16, status: "pending", source: "aggtrans", paid: 0 },
+  { truckId: truckIds[0], custId: custIds[1], material: "asphalt", pickup: "Plant, MD", dropoff: "Silver Spring, MD", tons: 24, miles: 30, rate_per_ton: 24, status: "delivered", source: "aggdirect", paid: 1 },
 ];
 
 loads.forEach((l, i) => {

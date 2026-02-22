@@ -58,10 +58,14 @@ export default function Loads() {
                       <span className="text-[10px] font-bold text-amber-400">{l.load_number}</span>
                       <span className="text-sm">{MATERIAL_ICONS[l.material] || '📦'}</span>
                     </div>
-                    <div className="text-xs font-semibold text-white capitalize">{l.material}</div>
-                    <div className="text-[10px] text-slate-400 truncate">{l.customer_name}</div>
+                    <div className="text-sm font-bold text-white capitalize">{l.material}</div>
+                    <div className="text-xs text-slate-300 truncate">{l.customer_name}</div>
                     <div className="text-[10px] text-slate-500 mt-1">{l.truck_name} · {l.tons}t · {l.miles}mi</div>
-                    <div className="text-[10px] text-emerald-400 font-bold">${parseFloat(l.gross_revenue||0).toFixed(0)} gross</div>
+                    <div className="flex items-center justify-between mt-1.5">
+                      <span className="text-sm font-bold text-amber-400">${parseFloat(l.gross_revenue||0).toFixed(0)}</span>
+                      {l.paid ? <span className="text-[9px] bg-emerald-900/40 text-emerald-400 px-1.5 py-0.5 rounded-full font-bold">PAID</span>
+                               : <span className="text-[9px] bg-red-900/30 text-red-400 px-1.5 py-0.5 rounded-full font-bold">UNPAID</span>}
+                    </div>
                     {stage !== 'paid' && (
                       <button onClick={e => advance(l, e)}
                         className="mt-2 w-full flex items-center justify-center gap-1 text-[10px] text-slate-500 hover:text-amber-400 hover:bg-amber-900/20 rounded-lg py-1 transition-all opacity-0 group-hover:opacity-100">
@@ -71,7 +75,10 @@ export default function Loads() {
                   </div>
                 ))}
                 {byStatus(stage).length === 0 && (
-                  <div className="text-center text-slate-600 text-xs py-6 border border-dashed border-[#1f2937] rounded-xl">Empty</div>
+                  <div className="text-center text-slate-600 text-xs py-8 border border-dashed border-[#1f2937] rounded-xl leading-relaxed">
+                    <div className="text-lg mb-1">🚛</div>
+                    No loads here
+                  </div>
                 )}
               </div>
             </div>
