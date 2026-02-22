@@ -17,8 +17,13 @@ export default function Login() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="text-6xl mb-3">🚛</div>
-          <h1 className="text-2xl font-bold text-white">PAYLOAD</h1>
-          <p className="text-slate-500 text-sm mt-1 italic">Every mile tracked. Every dollar earned.</p>
+          <h1 className="text-3xl font-bold text-white tracking-wide">PAYLOAD</h1>
+          <p className="text-xs font-semibold text-amber-400 uppercase tracking-widest mt-2">Trucking Fleet Management</p>
+          <div className="mt-3 space-y-0.5">
+            <p className="text-slate-400 text-sm italic">Every mile tracked.</p>
+            <p className="text-slate-400 text-sm italic">Every dollar earned.</p>
+            <p className="text-amber-400 text-sm italic font-medium">Every load delivered.</p>
+          </div>
         </div>
         <form onSubmit={submit} className="bg-[#111827] rounded-2xl p-6 border border-[#1f2937] space-y-4">
           <div>

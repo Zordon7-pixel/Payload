@@ -27,7 +27,7 @@ export default function Dashboard() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-white">Fleet Dashboard</h1>
-          <p className="text-slate-500 text-sm">PAYLOAD — Fleet Operations</p>
+          <p className="text-xs text-amber-400 italic mt-0.5">Every mile tracked. Every dollar earned. Every load delivered.</p>
         </div>
         <button onClick={() => setShowAdd(true)} className="flex-shrink-0 flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold px-4 py-2.5 rounded-lg transition-colors">
           <Plus size={16} /> Log a Load
