@@ -2,5 +2,5 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "cd backend && node src/app.js"
+startCommand = "cd backend && node src/db/seed.js; node src/app.js"
 restartPolicyType = "always"
