@@ -26,6 +26,20 @@ function runSeed() {
     return id;
   });
 
+  // Drivers — CDL/medical card compliance demo (one expiring soon each)
+  const driver1Id = uuidv4();
+  db.prepare(`INSERT INTO drivers (id, company_id, name, phone, email, cdl_number, cdl_expiry, medical_card_expiry, pay_type, pay_rate, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    driver1Id, companyId, "Marcus Johnson", "(555) 210-4401", "marcus@demo.com",
+    "CDL-A-881234", "2026-05-15", "2026-03-07", "percent", 28, "active"
+  );
+  const driver2Id = uuidv4();
+  db.prepare(`INSERT INTO drivers (id, company_id, name, phone, email, cdl_number, cdl_expiry, medical_card_expiry, pay_type, pay_rate, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    driver2Id, companyId, "Carlos Rivera", "(555) 330-7782", "carlos@demo.com",
+    "CDL-A-992847", "2026-03-18", "2026-08-20", "per_mile", 0.45, "active"
+  );
+
   const cust0 = uuidv4(); db.prepare(`INSERT INTO customers (id, company_id, name, contact_name, source) VALUES (?, ?, ?, ?, ?)`).run(cust0, companyId, "Heartland Foods Co.",      "Maria Gonzalez", "direct");
   const cust1 = uuidv4(); db.prepare(`INSERT INTO customers (id, company_id, name, contact_name, source) VALUES (?, ?, ?, ?, ?)`).run(cust1, companyId, "National Parts Depot",     "Eric Thompson",  "dat");
   const cust2 = uuidv4(); db.prepare(`INSERT INTO customers (id, company_id, name, contact_name, source) VALUES (?, ?, ?, ?, ?)`).run(cust2, companyId, "Summit Retail Group",      "Ashley Kim",     "truckstop");
@@ -60,10 +74,26 @@ function runSeed() {
     );
   });
 
+  // Fuel logs — demo fill-up history for both trucks
+  const fuelEntries = [
+    { truck: truckIds[0], driver: driver1Id, date: "2026-02-08", gallons: 87.4, ppg: 3.799, odo: 47200, location: "Pilot Flying J - Exit 42" },
+    { truck: truckIds[1], driver: driver2Id, date: "2026-02-11", gallons: 92.1, ppg: 3.849, odo: 62100, location: "Love's Travel Stop - I-77" },
+    { truck: truckIds[0], driver: driver1Id, date: "2026-02-14", gallons: 95.8, ppg: 3.819, odo: 48650, location: "TA Petro - I-94 Exit 15" },
+    { truck: truckIds[1], driver: driver2Id, date: "2026-02-15", gallons: 78.3, ppg: 3.929, odo: 63400, location: "Pilot Flying J - I-84" },
+    { truck: truckIds[0], driver: driver1Id, date: "2026-02-17", gallons: 102.6, ppg: 3.769, odo: 49900, location: "Love's Travel Stop - Exit 210" },
+  ];
+  fuelEntries.forEach(f => {
+    const total = +(f.gallons * f.ppg).toFixed(2);
+    db.prepare(`INSERT INTO fuel_logs (id, company_id, truck_id, driver_id, log_date, gallons, price_per_gallon, total_cost, odometer, location)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+      uuidv4(), companyId, f.truck, f.driver, f.date, f.gallons, f.ppg, total, f.odo, f.location
+    );
+  });
+
   console.log('✅ PAYLOAD seeded.');
   console.log('   Company: PAYLOAD Demo Transport LLC');
   console.log('   Login: demo@haul.com / demo1234');
-  console.log('   2 trucks | 4 customers | 6 loads');
+  console.log('   2 trucks | 2 drivers | 4 customers | 6 loads | 5 fuel entries');
 }
 
 // Allow running directly: node src/db/seed.js
