@@ -48,15 +48,15 @@ router.post('/', auth, requireOwner, (req, res) => {
 router.put('/:id', auth, requireOwner, (req, res) => {
   const user = db.prepare('SELECT id FROM users WHERE id = ? AND company_id = ?').get(req.params.id, req.user.company_id);
   if (!user) return res.status(404).json({ error: 'Not found' });
-  const { name, email, password, role, phone, truck_id } = req.body;
+  const ALLOWED_USER_FIELDS = ['name','phone','role','email','password'];
+  const updates = Object.fromEntries(Object.entries(req.body).filter(([k]) => ALLOWED_USER_FIELDS.includes(k)));
   const fields = []; const vals = [];
-  if (name)     { fields.push('name = ?');          vals.push(name.trim()); }
-  if (email)    { fields.push('email = ?');         vals.push(email.trim().toLowerCase()); }
-  if (password) { fields.push('password_hash = ?'); vals.push(bcrypt.hashSync(password, 10)); }
-  if (role)     { fields.push('role = ?');          vals.push(role); }
-  if (phone !== undefined)    { fields.push('phone = ?');    vals.push(phone||null); }
-  if (truck_id !== undefined) { fields.push('truck_id = ?'); vals.push(truck_id||null); }
-  if (!fields.length) return res.status(400).json({ error: 'Nothing to update' });
+  if (updates.name)     { fields.push('name = ?');          vals.push(updates.name.trim()); }
+  if (updates.email)    { fields.push('email = ?');         vals.push(updates.email.trim().toLowerCase()); }
+  if (updates.password) { fields.push('password_hash = ?'); vals.push(bcrypt.hashSync(updates.password, 10)); }
+  if (updates.role)     { fields.push('role = ?');          vals.push(updates.role); }
+  if (updates.phone !== undefined) { fields.push('phone = ?'); vals.push(updates.phone || null); }
+  if (!fields.length) return res.status(400).json({ error: 'No valid fields to update' });
   vals.push(req.params.id);
   db.prepare(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`).run(...vals);
   res.json(db.prepare('SELECT id, name, email, role, phone, truck_id FROM users WHERE id = ?').get(req.params.id));

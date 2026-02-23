@@ -65,9 +65,8 @@ router.post('/', auth, (req, res) => {
 router.put('/:id', auth, (req, res) => {
   const load = db.prepare('SELECT * FROM loads WHERE id = ? AND company_id = ?').get(req.params.id, req.user.company_id);
   if (!load) return res.status(404).json({ error: 'Not found' });
-  const updatable = ['truck_id','driver_id','customer_id','source','source_ref','material','pickup_location','dropoff_location','pickup_date','delivery_date','tons','miles','rate_per_ton','rate_per_mile','flat_rate','rate_type','fuel_cost','driver_pay','other_expenses','notes','paid','invoice_sent'];
-  const updates = {};
-  updatable.forEach(k => { if (req.body[k] !== undefined) updates[k] = req.body[k]; });
+  const ALLOWED_LOAD_FIELDS = ['status','notes','driver_id','truck_id','origin','destination','commodity','weight','rate','rate_type','distance','pickup_date','delivery_date','source','customer_id','load_type','updated_at','actual_rate','fuel_surcharge','source_ref','material','pickup_location','dropoff_location','tons','miles','rate_per_ton','rate_per_mile','flat_rate','fuel_cost','driver_pay','other_expenses','paid','invoice_sent'];
+  const updates = Object.fromEntries(Object.entries(req.body).filter(([k]) => ALLOWED_LOAD_FIELDS.includes(k)));
   if (Object.keys(updates).length) {
     const merged = { ...load, ...updates };
     const { gross, net } = calcProfit(merged);

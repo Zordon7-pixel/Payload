@@ -65,13 +65,22 @@ router.post('/', auth, (req, res) => {
 
 // PUT update compliance dates on truck
 router.put('/truck/:truckId/compliance', auth, (req, res) => {
-  const { dot_inspection_date, registration_expiry, insurance_expiry, current_mileage } = req.body;
+  const ALLOWED_TRUCK_FIELDS = ['make','model','year','vin','plate','status','notes','mileage','dot_inspection_date','registration_expiry','insurance_expiry','current_mileage'];
+  const updates = Object.fromEntries(Object.entries(req.body).filter(([k]) => ALLOWED_TRUCK_FIELDS.includes(k)));
   const fields = []; const vals = [];
-  if (dot_inspection_date != null) { fields.push('dot_inspection_date = ?'); vals.push(dot_inspection_date); }
-  if (registration_expiry != null) { fields.push('registration_expiry = ?'); vals.push(registration_expiry); }
-  if (insurance_expiry    != null) { fields.push('insurance_expiry = ?');    vals.push(insurance_expiry); }
-  if (current_mileage     != null) { fields.push('current_mileage = ?');     vals.push(current_mileage); }
-  if (!fields.length) return res.status(400).json({ error: 'Nothing to update' });
+  if (updates.make != null) { fields.push('make = ?'); vals.push(updates.make); }
+  if (updates.model != null) { fields.push('model = ?'); vals.push(updates.model); }
+  if (updates.year != null) { fields.push('year = ?'); vals.push(updates.year); }
+  if (updates.vin != null) { fields.push('vin = ?'); vals.push(updates.vin); }
+  if (updates.plate != null) { fields.push('plate = ?'); vals.push(updates.plate); }
+  if (updates.status != null) { fields.push('status = ?'); vals.push(updates.status); }
+  if (updates.notes != null) { fields.push('notes = ?'); vals.push(updates.notes); }
+  if (updates.mileage != null && updates.current_mileage == null) { updates.current_mileage = updates.mileage; }
+  if (updates.dot_inspection_date != null) { fields.push('dot_inspection_date = ?'); vals.push(updates.dot_inspection_date); }
+  if (updates.registration_expiry != null) { fields.push('registration_expiry = ?'); vals.push(updates.registration_expiry); }
+  if (updates.insurance_expiry != null) { fields.push('insurance_expiry = ?'); vals.push(updates.insurance_expiry); }
+  if (updates.current_mileage != null) { fields.push('current_mileage = ?'); vals.push(updates.current_mileage); }
+  if (!fields.length) return res.status(400).json({ error: 'No valid fields to update' });
   vals.push(req.params.truckId, req.user.company_id);
   db.prepare(`UPDATE trucks SET ${fields.join(', ')} WHERE id = ? AND company_id = ?`).run(...vals);
   res.json(db.prepare('SELECT * FROM trucks WHERE id = ?').get(req.params.truckId));

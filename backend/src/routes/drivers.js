@@ -47,10 +47,16 @@ router.post('/', auth, (req, res) => {
 router.put('/:id', auth, (req, res) => {
   const d = db.prepare('SELECT id FROM drivers WHERE id = ? AND company_id = ?').get(req.params.id, req.user.company_id);
   if (!d) return res.status(404).json({ error: 'Not found' });
-  const fields = ['name','phone','email','cdl_number','cdl_expiry','medical_card_expiry','pay_type','pay_rate','status','notes'];
+  const ALLOWED_DRIVER_FIELDS = ['name','phone','email','cdl_number','cdl_expiry','medical_expiry','status','pay_type','pay_rate','notes','medical_card_expiry'];
+  const updatesObj = Object.fromEntries(Object.entries(req.body).filter(([k]) => ALLOWED_DRIVER_FIELDS.includes(k)));
+  if (updatesObj.medical_expiry !== undefined && updatesObj.medical_card_expiry === undefined) {
+    updatesObj.medical_card_expiry = updatesObj.medical_expiry;
+  }
+  delete updatesObj.medical_expiry;
+
   const updates = []; const vals = [];
-  fields.forEach(f => { if (req.body[f] !== undefined) { updates.push(`${f} = ?`); vals.push(req.body[f]); } });
-  if (!updates.length) return res.status(400).json({ error: 'Nothing to update' });
+  Object.entries(updatesObj).forEach(([k, v]) => { updates.push(`${k} = ?`); vals.push(v); });
+  if (!updates.length) return res.status(400).json({ error: 'No valid fields to update' });
   vals.push(req.params.id);
   db.prepare(`UPDATE drivers SET ${updates.join(', ')} WHERE id = ?`).run(...vals);
   res.json(db.prepare('SELECT * FROM drivers WHERE id = ?').get(req.params.id));
