@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const auth = require('../middleware/auth');
-const { requireAdmin } = require('../middleware/roles');
+const { requireOwner: requireAdmin } = require('../middleware/roles');
 const db = require('../db');
 
 // GET /api/diagnostics
