@@ -56,17 +56,18 @@ export default function Dashboard() {
     return 'Good evening 👋'
   }, [])
 
-  if (!data) return <div className="flex items-center justify-center h-64 text-slate-500">Loading your fleet data...</div>
-
-  const totalLoads = Number(data.totalLoads || data.total || (data.active || 0) + (data.delivered || 0))
-  const grossRevenue = Number(data.grossRev || 0)
-  const totalMilesRaw = Number(data.totalMiles || data.miles || (data.recent || []).reduce((sum, l) => sum + Number(l.miles || 0), 0))
-  const unpaidAmount = Number(data.unpaid?.amount || 0)
+  // All hooks must be called unconditionally — before any early return
+  const totalLoads = data ? Number(data.totalLoads || data.total || (data.active || 0) + (data.delivered || 0)) : 0
+  const grossRevenue = data ? Number(data.grossRev || 0) : 0
+  const totalMilesRaw = data ? Number(data.totalMiles || data.miles || (data.recent || []).reduce((sum, l) => sum + Number(l.miles || 0), 0)) : 0
+  const unpaidAmount = data ? Number(data.unpaid?.amount || 0) : 0
 
   const totalLoadsCount = useCountUp(totalLoads)
   const grossRevenueCount = useCountUp(grossRevenue)
   const totalMilesCount = useCountUp(totalMilesRaw)
   const unpaidCount = useCountUp(unpaidAmount)
+
+  if (!data) return <div className="flex items-center justify-center h-64 text-slate-500">Loading your fleet data...</div>
 
   const stats = [
     { label: 'Active Loads', value: totalLoadsCount.toLocaleString(), icon: Package, color: 'text-amber-300', bg: 'bg-gradient-to-br from-amber-900/40 to-[#1a1d2e]', accent: 'bg-amber-500' },
