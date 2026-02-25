@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle, Wrench } from 'lucide-react';
 
 export default class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -18,7 +19,7 @@ export default class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div style={{ minHeight: '100vh', background: '#0f1117', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, padding: 32, fontFamily: 'sans-serif' }}>
-          <div style={{ fontSize: 48 }}>⚠️</div>
+          <AlertTriangle size={48} color="#f59e0b" />
           <h1 style={{ color: '#fff', fontSize: 22, fontWeight: 700, margin: 0 }}>Something went wrong</h1>
           <p style={{ color: '#94a3b8', fontSize: 14, margin: 0, textAlign: 'center', maxWidth: 400 }}>
             PAYLOAD ran into an unexpected error. Click below to attempt an automatic repair and reload.
@@ -27,7 +28,10 @@ export default class ErrorBoundary extends React.Component {
             {this.state.error?.message || 'Unknown error'}
           </p>
           <button onClick={() => window.location.reload()} style={{ background: '#f59e0b', color: '#000', border: 'none', borderRadius: 8, padding: '10px 24px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
-            🔧 Repair &amp; Reload
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <Wrench size={14} />
+              Repair &amp; Reload
+            </span>
           </button>
         </div>
       );

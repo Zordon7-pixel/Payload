@@ -1,15 +1,15 @@
 import { useState } from 'react'
-import { MessageSquarePlus, X, Send, Plus, CheckCircle, Trash2 } from 'lucide-react'
+import { MessageSquarePlus, X, Send, Plus, CheckCircle, Trash2, Bug, Palette, Lightbulb, CircleHelp, Search, Rocket } from 'lucide-react'
 import api from '../lib/api'
 import { useLocation } from 'react-router-dom'
 
 const CATEGORIES = [
-  { value: 'bug', label: '🐛 Bug / Broken', soldier: 'Codex 5.3', color: 'text-red-400' },
-  { value: 'ui', label: '🎨 Design / UI', soldier: 'Codex 5.3', color: 'text-purple-400' },
-  { value: 'feature', label: '💡 Feature Idea', soldier: 'Colonel Zordon', color: 'text-amber-400' },
-  { value: 'question', label: '❓ Question', soldier: 'Colonel Zordon', color: 'text-blue-400' },
-  { value: 'missing', label: '🔍 Missing Info', soldier: 'Codex 5.3', color: 'text-orange-400' },
-  { value: 'idea', label: '🚀 Big Idea', soldier: 'Colonel Zordon', color: 'text-yellow-400' },
+  { value: 'bug', label: 'Bug / Broken', icon: Bug, soldier: 'Codex 5.3', color: 'text-red-400' },
+  { value: 'ui', label: 'Design / UI', icon: Palette, soldier: 'Codex 5.3', color: 'text-purple-400' },
+  { value: 'feature', label: 'Feature Idea', icon: Lightbulb, soldier: 'Colonel Zordon', color: 'text-amber-400' },
+  { value: 'question', label: 'Question', icon: CircleHelp, soldier: 'Colonel Zordon', color: 'text-blue-400' },
+  { value: 'missing', label: 'Missing Info', icon: Search, soldier: 'Codex 5.3', color: 'text-orange-400' },
+  { value: 'idea', label: 'Big Idea', icon: Rocket, soldier: 'Colonel Zordon', color: 'text-yellow-400' },
 ]
 
 const PRIORITIES = [
@@ -95,7 +95,13 @@ export default function FeedbackButton() {
                 <div className="space-y-2 mb-5">
                   {submitted.map((it, i) => (
                     <div key={i} className="flex items-center justify-between bg-[#0f1117] rounded-lg px-3 py-2 text-xs">
-                      <span className="text-slate-300">{cat(it.category)?.label}</span>
+                      <span className="text-slate-300 inline-flex items-center gap-1.5">
+                        {(() => {
+                          const Icon = cat(it.category)?.icon || CircleHelp
+                          return <Icon size={12} />
+                        })()}
+                        {cat(it.category)?.label}
+                      </span>
                       <span className="text-amber-400 font-medium">→ {cat(it.category)?.soldier}</span>
                     </div>
                   ))}

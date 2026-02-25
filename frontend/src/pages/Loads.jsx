@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, ChevronRight } from 'lucide-react'
+import { Plus, ChevronRight, Package, Wrench, Hammer, Laptop, Utensils, Sofa, AlertTriangle, Cog, Trees, Factory, Ruler, Snowflake, Cable, Truck, ClipboardList, Radio, FileText, DollarSign, HelpCircle, X } from 'lucide-react'
 import api from '../lib/api'
 import AddLoadModal from '../components/AddLoadModal'
 
@@ -8,27 +8,28 @@ export const STATUS_COLORS = { pending:'#64748b', dispatched:'#3b82f6', loaded:'
 export const STATUS_LABELS = { pending:'Pending', dispatched:'Dispatched', loaded:'Loaded', in_transit:'In Transit', delivered:'Delivered', invoiced:'Invoiced', paid:'Paid' }
 const STAGES = ['pending','dispatched','loaded','in_transit','delivered','invoiced','paid']
 const MATERIAL_ICONS = {
-  'General Freight':'📦', 'Auto Parts':'🔧', 'Building Materials':'🏗️', 'Electronics':'💻',
-  'Food & Beverage':'🥡', 'Furniture / Household':'🛋️', 'Hazmat':'⚠️', 'Heavy Equipment':'⚙️',
-  'Lumber':'🪵', 'Machinery':'🏭', 'Oversized / Wide Load':'📐', 'Palletized Goods':'📦',
-  'Refrigerated / Reefer':'❄️', 'Steel / Metal':'🔩', 'Other':'🚛',
+  'General Freight': Package, 'Auto Parts': Wrench, 'Building Materials': Hammer, 'Electronics': Laptop,
+  'Food & Beverage': Utensils, 'Furniture / Household': Sofa, 'Hazmat': AlertTriangle, 'Heavy Equipment': Cog,
+  'Lumber': Trees, 'Machinery': Factory, 'Oversized / Wide Load': Ruler, 'Palletized Goods': Package,
+  'Refrigerated / Reefer': Snowflake, 'Steel / Metal': Cable, 'Other': Truck,
 }
 
 const LOAD_STATUS = {
-  pending: { color: 'bg-slate-700 text-slate-200', icon: '📋', label: 'Pending' },
-  dispatched: { color: 'bg-blue-900/60 text-blue-300', icon: '📡', label: 'Dispatched' },
-  loaded: { color: 'bg-amber-900/60 text-amber-300', icon: '📦', label: 'Loaded' },
-  in_transit: { color: 'bg-orange-900/60 text-orange-300', icon: '🚛', label: 'In Transit' },
-  delivered: { color: 'bg-emerald-900/60 text-emerald-300', icon: '✅', label: 'Delivered' },
-  invoiced: { color: 'bg-purple-900/60 text-purple-300', icon: '🧾', label: 'Invoiced' },
-  paid: { color: 'bg-green-900/60 text-green-300', icon: '💰', label: 'Paid' },
+  pending: { color: 'bg-slate-700 text-slate-200', icon: ClipboardList, label: 'Pending' },
+  dispatched: { color: 'bg-blue-900/60 text-blue-300', icon: Radio, label: 'Dispatched' },
+  loaded: { color: 'bg-amber-900/60 text-amber-300', icon: Package, label: 'Loaded' },
+  in_transit: { color: 'bg-orange-900/60 text-orange-300', icon: Truck, label: 'In Transit' },
+  delivered: { color: 'bg-emerald-900/60 text-emerald-300', icon: Package, label: 'Delivered' },
+  invoiced: { color: 'bg-purple-900/60 text-purple-300', icon: FileText, label: 'Invoiced' },
+  paid: { color: 'bg-green-900/60 text-green-300', icon: DollarSign, label: 'Paid' },
 }
 
 function LoadStatusBadge({ status }) {
-  const cfg = LOAD_STATUS[status] || { color: 'bg-slate-700 text-slate-300', icon: '❓', label: status }
+  const cfg = LOAD_STATUS[status] || { color: 'bg-slate-700 text-slate-300', icon: HelpCircle, label: status }
+  const Icon = cfg.icon
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${cfg.color}`}>
-      <span>{cfg.icon}</span>{cfg.label}
+      <Icon size={12} />{cfg.label}
     </span>
   )
 }
@@ -36,6 +37,10 @@ function LoadStatusBadge({ status }) {
 export default function Loads() {
   const [loads, setLoads] = useState([])
   const [showAdd, setShowAdd] = useState(false)
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [fromDate, setFromDate] = useState('')
+  const [toDate, setToDate] = useState('')
   const navigate = useNavigate()
 
   const load = () => api.get('/loads').then(r => setLoads(r.data.loads))
@@ -50,7 +55,17 @@ export default function Loads() {
     }
   }
 
-  const byStatus = stage => loads.filter(l => l.status === stage)
+  const filteredLoads = loads.filter(l => {
+    const haystack = `${l.load_number || ''} ${l.pickup_location || l.origin || ''} ${l.dropoff_location || l.destination || ''}`.toLowerCase()
+    const matchesSearch = !search || haystack.includes(search.toLowerCase())
+    const matchesStatus = statusFilter === 'all' || l.status === statusFilter
+    const pick = l.pickup_date ? new Date(l.pickup_date) : null
+    const fromOk = !fromDate || (pick && pick >= new Date(fromDate))
+    const toOk = !toDate || (pick && pick <= new Date(toDate))
+    return matchesSearch && matchesStatus && fromOk && toOk
+  })
+
+  const byStatus = stage => filteredLoads.filter(l => l.status === stage)
 
   return (
     <div className="space-y-4">
@@ -62,6 +77,38 @@ export default function Loads() {
         <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold px-4 py-2 rounded-lg transition-colors">
           <Plus size={16} /> New Load
         </button>
+      </div>
+
+      <div className="bg-[#111827] border border-[#1f2937] rounded-xl p-3">
+        <div className="grid md:grid-cols-5 gap-2">
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search load #, origin, destination"
+            className="md:col-span-2 bg-[#0a0f1e] border border-[#1f2937] rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-amber-500"
+          />
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="bg-[#0a0f1e] border border-[#1f2937] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+          >
+            <option value="all">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="in_transit">In Transit</option>
+            <option value="delivered">Delivered</option>
+            <option value="paid">Paid</option>
+          </select>
+          <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} className="bg-[#0a0f1e] border border-[#1f2937] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500" />
+          <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} className="bg-[#0a0f1e] border border-[#1f2937] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500" />
+        </div>
+        <div className="mt-2">
+          <button
+            onClick={() => { setSearch(''); setStatusFilter('all'); setFromDate(''); setToDate('') }}
+            className="inline-flex items-center gap-1.5 text-xs text-slate-300 border border-[#1f2937] hover:border-amber-500 hover:text-amber-400 px-2.5 py-1 rounded-lg transition-colors"
+          >
+            <X size={12} /> Clear Filters
+          </button>
+        </div>
       </div>
 
       {loads.length === 0 ? (
@@ -87,7 +134,10 @@ export default function Loads() {
                       style={{borderLeft: `3px solid ${STATUS_COLORS[stage]}`}}>
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="text-[10px] font-bold text-amber-400">{l.load_number}</span>
-                        <span className="text-sm">{MATERIAL_ICONS[l.material] || '📦'}</span>
+                        {(() => {
+                          const MaterialIcon = MATERIAL_ICONS[l.material] || Package
+                          return <MaterialIcon size={14} className="text-amber-400" />
+                        })()}
                       </div>
                       <div className="mb-1.5"><LoadStatusBadge status={l.status} /></div>
                       <div className="text-sm font-bold text-white capitalize">{l.material}</div>
@@ -108,7 +158,7 @@ export default function Loads() {
                   ))}
                   {byStatus(stage).length === 0 && (
                     <div className="text-center text-slate-600 text-xs py-8 border border-dashed border-[#1f2937] rounded-xl leading-relaxed">
-                      <div className="text-lg mb-1">🚛</div>
+                      <div className="flex justify-center mb-1"><Truck size={16} /></div>
                       No loads here
                     </div>
                   )}

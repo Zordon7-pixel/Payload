@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { X, CheckCircle, XCircle } from 'lucide-react'
 
 export default function HelpDesk() {
   const [open, setOpen] = useState(false)
@@ -67,7 +68,7 @@ export default function HelpDesk() {
           <div className="w-full max-w-3xl rounded-xl border p-5" style={{ background: '#1a1d2e', borderColor: '#2a2d3e' }}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold" style={{ color: '#f59e0b' }}>PAYLOAD HelpDesk</h2>
-              <button onClick={() => setOpen(false)} className="text-slate-300 hover:text-white">✕</button>
+              <button onClick={() => setOpen(false)} className="text-slate-300 hover:text-white"><X size={16} /></button>
             </div>
 
             {loading ? (
@@ -78,7 +79,7 @@ export default function HelpDesk() {
             ) : (
               <>
                 <div className="mb-4 text-sm font-semibold" style={{ color: diag?.ok ? '#22c55e' : '#ef4444' }}>
-                  {diag?.ok ? 'All systems healthy 🟢' : 'Issues detected 🔴'}
+                  {diag?.ok ? 'All systems healthy' : 'Issues detected'}
                 </div>
 
                 {!!error && <div className="mb-4 text-red-400 text-sm">{error}</div>}
@@ -86,7 +87,7 @@ export default function HelpDesk() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
                   {(diag?.checks || []).map((c, i) => (
                     <div key={`${c.name}-${i}`} className="rounded-lg border p-3" style={{ borderColor: '#2a2d3e', background: '#121525' }}>
-                      <div className="font-medium text-sm text-white">{c.ok ? '✅' : '❌'} {c.name}</div>
+                      <div className="font-medium text-sm text-white inline-flex items-center gap-1.5">{c.ok ? <CheckCircle size={13} className="text-emerald-400" /> : <XCircle size={13} className="text-red-400" />} {c.name}</div>
                       <div className="text-xs text-slate-400 mt-1">{c.detail}</div>
                     </div>
                   ))}

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Truck, Package, DollarSign, Route, AlertCircle, Plus, BarChart2 } from 'lucide-react'
+import { Truck, Package, DollarSign, Route, AlertCircle, Plus, BarChart2, ClipboardList, Radio, FileText, HelpCircle, CircleCheck } from 'lucide-react'
 import api from '../lib/api'
 import AddLoadModal from '../components/AddLoadModal'
 
@@ -8,20 +8,21 @@ const SOURCE_LABELS = { direct:'Direct', dat:'DAT', truckstop:'Truckstop.com', b
 const SOURCE_COLORS = { direct:'#22c55e', dat:'#f97316', truckstop:'#3b82f6', broker:'#a855f7', aggtrans:'#f59e0b', aggdirect:'#06b6d4', other:'#64748b' }
 
 const LOAD_STATUS = {
-  pending: { color: 'bg-slate-700 text-slate-200', icon: '📋', label: 'Pending' },
-  dispatched: { color: 'bg-blue-900/60 text-blue-300', icon: '📡', label: 'Dispatched' },
-  loaded: { color: 'bg-amber-900/60 text-amber-300', icon: '📦', label: 'Loaded' },
-  in_transit: { color: 'bg-orange-900/60 text-orange-300', icon: '🚛', label: 'In Transit' },
-  delivered: { color: 'bg-emerald-900/60 text-emerald-300', icon: '✅', label: 'Delivered' },
-  invoiced: { color: 'bg-purple-900/60 text-purple-300', icon: '🧾', label: 'Invoiced' },
-  paid: { color: 'bg-green-900/60 text-green-300', icon: '💰', label: 'Paid' },
+  pending: { color: 'bg-slate-700 text-slate-200', icon: ClipboardList, label: 'Pending' },
+  dispatched: { color: 'bg-blue-900/60 text-blue-300', icon: Radio, label: 'Dispatched' },
+  loaded: { color: 'bg-amber-900/60 text-amber-300', icon: Package, label: 'Loaded' },
+  in_transit: { color: 'bg-orange-900/60 text-orange-300', icon: Truck, label: 'In Transit' },
+  delivered: { color: 'bg-emerald-900/60 text-emerald-300', icon: CircleCheck, label: 'Delivered' },
+  invoiced: { color: 'bg-purple-900/60 text-purple-300', icon: FileText, label: 'Invoiced' },
+  paid: { color: 'bg-green-900/60 text-green-300', icon: DollarSign, label: 'Paid' },
 }
 
 function LoadStatusBadge({ status }) {
-  const cfg = LOAD_STATUS[status] || { color: 'bg-slate-700 text-slate-300', icon: '❓', label: status }
+  const cfg = LOAD_STATUS[status] || { color: 'bg-slate-700 text-slate-300', icon: HelpCircle, label: status }
+  const Icon = cfg.icon
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${cfg.color}`}>
-      <span>{cfg.icon}</span>{cfg.label}
+      <Icon size={12} />{cfg.label}
     </span>
   )
 }
@@ -51,9 +52,9 @@ export default function Dashboard() {
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours()
-    if (hour < 12) return 'Good morning 👋'
-    if (hour < 18) return 'Good afternoon 👋'
-    return 'Good evening 👋'
+    if (hour < 12) return 'Good morning'
+    if (hour < 18) return 'Good afternoon'
+    return 'Good evening'
   }, [])
 
   // All hooks must be called unconditionally — before any early return
@@ -181,7 +182,7 @@ export default function Dashboard() {
             const best = [...data.bySource].sort((a,b) => b.margin_pct - a.margin_pct)[0]
             return (
               <div className="mt-3 pt-3 border-t border-[#1f2937] text-xs text-slate-400">
-                💡 <strong className="text-white">{SOURCE_LABELS[best.source] || best.source}</strong> is your most profitable source at <strong className="text-emerald-400">{best.margin_pct}% margin</strong>
+                <strong className="text-white">{SOURCE_LABELS[best.source] || best.source}</strong> is your most profitable source at <strong className="text-emerald-400">{best.margin_pct}% margin</strong>
               </div>
             )
           })()}

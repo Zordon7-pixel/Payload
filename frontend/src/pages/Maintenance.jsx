@@ -84,7 +84,7 @@ export default function Maintenance() {
         {['logs','compliance'].map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${tab===t ? 'bg-amber-500 text-black' : 'bg-[#111827] text-slate-400 border border-[#1f2937] hover:text-white'}`}>
-            {t === 'compliance' && totalAlerts > 0 ? `Compliance ⚠️` : t.charAt(0).toUpperCase()+t.slice(1)}
+            {t === 'compliance' && totalAlerts > 0 ? `Compliance Alert` : t.charAt(0).toUpperCase()+t.slice(1)}
           </button>
         ))}
       </div>

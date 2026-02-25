@@ -2,41 +2,42 @@ import { useEffect, useState } from 'react'
 import {
   MapPin, Package, CheckCircle, Truck, Navigation, DollarSign, RefreshCw,
   ClipboardCheck, XCircle, MinusCircle, AlertTriangle, ChevronDown, ChevronUp,
-  ClipboardList, Wrench
+  ClipboardList, Wrench, Circle, Droplets, Link2, Octagon, Lightbulb, Armchair,
+  Hammer, Laptop, Utensils, Sofa, Cog, Trees, Factory, Ruler, Snowflake, Cable
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import api from '../lib/api'
 
 // ── Post-Trip Inspection Data ──────────────────────────────────────────────
 const POSTTRIP_GROUPS = [
-  { group:'Body & Exterior',   icon:'🚛', items:[
+  { group:'Body & Exterior',   icon: Truck, items:[
     { key:'no_new_damage',    label:'No New Body Damage / Dents' },
     { key:'lights_intact',    label:'All Lights Intact' },
     { key:'mirrors_ok',       label:'Mirrors Undamaged' },
     { key:'windshield_ok',    label:'Windshield Undamaged' },
   ]},
-  { group:'Mechanical',        icon:'🔧', items:[
+  { group:'Mechanical',        icon: Wrench, items:[
     { key:'no_warning_lights',label:'No Warning Lights On' },
     { key:'no_unusual_sounds',label:'No Unusual Sounds / Vibrations' },
     { key:'brakes_ok',        label:'Brakes Felt Normal All Day' },
     { key:'steering_ok',      label:'Steering Felt Normal' },
     { key:'transmission_ok',  label:'Transmission / Shifting Normal' },
   ]},
-  { group:'Tires',             icon:'🔘', items:[
+  { group:'Tires',             icon: Circle, items:[
     { key:'no_blowouts',      label:'No Blowouts or Flats' },
     { key:'tires_after_run',  label:'Tires Look OK After Run' },
   ]},
-  { group:'Fluids',            icon:'💧', items:[
+  { group:'Fluids',            icon: Droplets, items:[
     { key:'no_new_leaks',     label:'No New Leaks Noticed' },
     { key:'oil_ok_postrun',   label:'Oil Level OK After Run' },
     { key:'coolant_ok_postrun',label:'No Overheating / Coolant OK' },
   ]},
-  { group:'Equipment & Cargo', icon:'⛓️', items:[
+  { group:'Equipment & Cargo', icon: Link2, items:[
     { key:'straps_chains_ok', label:'Straps / Chains / Binders Intact' },
     { key:'tarps_ok',         label:'Tarps / Covers OK' },
     { key:'load_area_clear',  label:'Load Area Cleared / Cleaned' },
   ]},
-  { group:'End of Shift',      icon:'📋', items:[
+  { group:'End of Shift',      icon: ClipboardList, items:[
     { key:'cab_clean',        label:'Cab Clean & Trash Removed' },
     { key:'windows_secure',   label:'Windows Closed & Secured' },
     { key:'fuel_ok',          label:'Fuel Level Noted / Adequate for Tomorrow' },
@@ -47,13 +48,13 @@ POSTTRIP_GROUPS.forEach(g => g.items.forEach(i => { DEFAULT_POSTTRIP_ITEMS[i.key
 
 // ── Pre-Trip Inspection Data ───────────────────────────────────────────────
 const INSPECTION_GROUPS = [
-  { group:'Brakes',       icon:'🛑', items:[{key:'service_brakes',label:'Service Brakes'},{key:'parking_brake',label:'Parking Brake'}] },
-  { group:'Lights',       icon:'💡', items:[{key:'headlights',label:'Headlights'},{key:'taillights',label:'Taillights'},{key:'brake_lights',label:'Brake Lights'},{key:'turn_signals',label:'Turn Signals'},{key:'hazard_lights',label:'Hazard Lights'},{key:'marker_lights',label:'Clearance / Marker Lights'}] },
-  { group:'Tires & Wheels',icon:'🔘',items:[{key:'tire_condition',label:'Tire Condition & Tread'},{key:'tire_inflation',label:'Tire Inflation'},{key:'wheels_rims',label:'Wheels & Rims'},{key:'lug_nuts',label:'Lug Nuts / Fasteners'}] },
-  { group:'Exterior',     icon:'🪞', items:[{key:'mirrors',label:'Mirrors (both sides)'},{key:'windshield',label:'Windshield (no cracks)'},{key:'wipers_washers',label:'Wipers & Washers'},{key:'horn',label:'Horn'},{key:'reflectors',label:'Reflectors / Reflective Tape'}] },
-  { group:'Engine & Fluids',icon:'🔧',items:[{key:'oil_level',label:'Oil Level'},{key:'coolant_level',label:'Coolant Level'},{key:'fuel_level',label:'Fuel Level'},{key:'no_leaks',label:'No Visible Leaks'},{key:'belts_hoses',label:'Belts & Hoses'},{key:'air_pressure',label:'Air Pressure / Gauges'}] },
-  { group:'Cab Interior', icon:'🪑', items:[{key:'seatbelt',label:'Seatbelt'},{key:'steering',label:'Steering (no excessive play)'},{key:'gauges_controls',label:'Gauges & Controls'},{key:'emergency_triangles',label:'Emergency Triangles'},{key:'fire_extinguisher',label:'Fire Extinguisher'},{key:'first_aid',label:'First Aid Kit'}] },
-  { group:'Body & Frame',  icon:'🚛', items:[{key:'body_damage',label:'No New Body Damage'},{key:'doors_secure',label:'Doors & Latches Secure'},{key:'exhaust',label:'Exhaust System'},{key:'suspension',label:'Suspension'}] },
+  { group:'Brakes',       icon: Octagon, items:[{key:'service_brakes',label:'Service Brakes'},{key:'parking_brake',label:'Parking Brake'}] },
+  { group:'Lights',       icon: Lightbulb, items:[{key:'headlights',label:'Headlights'},{key:'taillights',label:'Taillights'},{key:'brake_lights',label:'Brake Lights'},{key:'turn_signals',label:'Turn Signals'},{key:'hazard_lights',label:'Hazard Lights'},{key:'marker_lights',label:'Clearance / Marker Lights'}] },
+  { group:'Tires & Wheels',icon: Circle,items:[{key:'tire_condition',label:'Tire Condition & Tread'},{key:'tire_inflation',label:'Tire Inflation'},{key:'wheels_rims',label:'Wheels & Rims'},{key:'lug_nuts',label:'Lug Nuts / Fasteners'}] },
+  { group:'Exterior',     icon: Truck, items:[{key:'mirrors',label:'Mirrors (both sides)'},{key:'windshield',label:'Windshield (no cracks)'},{key:'wipers_washers',label:'Wipers & Washers'},{key:'horn',label:'Horn'},{key:'reflectors',label:'Reflectors / Reflective Tape'}] },
+  { group:'Engine & Fluids',icon: Wrench,items:[{key:'oil_level',label:'Oil Level'},{key:'coolant_level',label:'Coolant Level'},{key:'fuel_level',label:'Fuel Level'},{key:'no_leaks',label:'No Visible Leaks'},{key:'belts_hoses',label:'Belts & Hoses'},{key:'air_pressure',label:'Air Pressure / Gauges'}] },
+  { group:'Cab Interior', icon: Armchair, items:[{key:'seatbelt',label:'Seatbelt'},{key:'steering',label:'Steering (no excessive play)'},{key:'gauges_controls',label:'Gauges & Controls'},{key:'emergency_triangles',label:'Emergency Triangles'},{key:'fire_extinguisher',label:'Fire Extinguisher'},{key:'first_aid',label:'First Aid Kit'}] },
+  { group:'Body & Frame',  icon: Truck, items:[{key:'body_damage',label:'No New Body Damage'},{key:'doors_secure',label:'Doors & Latches Secure'},{key:'exhaust',label:'Exhaust System'},{key:'suspension',label:'Suspension'}] },
 ]
 const DEFAULT_ITEMS = {}
 INSPECTION_GROUPS.forEach(g => g.items.forEach(i => { DEFAULT_ITEMS[i.key] = 'pass' }))
@@ -124,7 +125,7 @@ function PostTripSection() {
       none:      { label:'All Clear',     cls:'text-emerald-400 bg-emerald-900/20 border-emerald-700/40' },
       pending:   { label:'Repair Needed', cls:'text-red-400 bg-red-900/20 border-red-700/40' },
       scheduled: { label:'Repair Scheduled', cls:'text-amber-400 bg-amber-900/20 border-amber-700/40' },
-      repaired:  { label:'Repaired ✓',    cls:'text-emerald-400 bg-emerald-900/20 border-emerald-700/40' },
+      repaired:  { label:'Repaired',    cls:'text-emerald-400 bg-emerald-900/20 border-emerald-700/40' },
     }[todayInsp.repair_status] || { label: todayInsp.repair_status, cls: '' }
 
     return (
@@ -136,7 +137,7 @@ function PostTripSection() {
             </div>
             <div className="flex-1">
               <div className={`font-bold text-sm ${todayInsp.repair_status === 'pending' ? 'text-red-400' : 'text-emerald-400'}`}>
-                {todayInsp.repair_status === 'pending' ? '⚠️ Post-trip filed — repairs needed' : "✓ Today's post-trip complete"}
+                {todayInsp.repair_status === 'pending' ? 'Post-trip filed - repairs needed' : "Today's post-trip complete"}
               </div>
               <div className="text-xs text-slate-500">{todayInsp.truck_name} · {todayInsp.truck_plate}</div>
             </div>
@@ -221,9 +222,11 @@ function PostTripSection() {
         )}
       </div>
 
-      {POSTTRIP_GROUPS.map(group => (
+      {POSTTRIP_GROUPS.map(group => {
+        const GroupIcon = group.icon
+        return (
         <div key={group.group} className="bg-[#111827] rounded-2xl border border-[#1f2937] p-4">
-          <h4 className="text-sm font-bold text-white mb-3">{group.icon} {group.group}</h4>
+          <h4 className="text-sm font-bold text-white mb-3 inline-flex items-center gap-1.5"><GroupIcon size={14} /> {group.group}</h4>
           <div className="space-y-3">
             {group.items.map(item => (
               <div key={item.key} className="flex items-center justify-between gap-3">
@@ -233,7 +236,7 @@ function PostTripSection() {
             ))}
           </div>
         </div>
-      ))}
+      )})}
 
       <div className="bg-[#111827] rounded-2xl border border-[#1f2937] p-5 space-y-3">
         <div>
@@ -255,7 +258,7 @@ function PostTripSection() {
         <button type="submit"
           disabled={saving || !form.truck_id || !form.driver_signature}
           className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-4 rounded-xl text-sm disabled:opacity-50 transition-colors">
-          {saving ? 'Submitting...' : failCount > 0 ? `⚠️ Submit — ${failCount} Issue${failCount>1?'s':''} Flagged` : '✓ Submit Post-Trip Report'}
+          {saving ? 'Submitting...' : failCount > 0 ? `Submit - ${failCount} Issue${failCount>1?'s':''} Flagged` : 'Submit Post-Trip Report'}
         </button>
       </div>
     </form>
@@ -318,7 +321,7 @@ function PreTripSection() {
             </div>
             <div className="flex-1">
               <div className={`font-bold text-sm ${todayInsp.overall_pass ? 'text-emerald-400' : 'text-red-400'}`}>
-                {todayInsp.overall_pass ? "✓ Today's inspection complete" : "⚠️ Defects reported today"}
+                {todayInsp.overall_pass ? "Today's inspection complete" : "Defects reported today"}
               </div>
               <div className="text-xs text-slate-500">{todayInsp.truck_name} · {todayInsp.truck_plate}</div>
             </div>
@@ -403,9 +406,11 @@ function PreTripSection() {
       </div>
 
       {/* Inspection groups */}
-      {INSPECTION_GROUPS.map(group => (
+      {INSPECTION_GROUPS.map(group => {
+        const GroupIcon = group.icon
+        return (
         <div key={group.group} className="bg-[#111827] rounded-2xl border border-[#1f2937] p-4">
-          <h4 className="text-sm font-bold text-white mb-3">{group.icon} {group.group}</h4>
+          <h4 className="text-sm font-bold text-white mb-3 inline-flex items-center gap-1.5"><GroupIcon size={14} /> {group.group}</h4>
           <div className="space-y-3">
             {group.items.map(item => (
               <div key={item.key} className="flex items-center justify-between gap-3">
@@ -415,7 +420,7 @@ function PreTripSection() {
             ))}
           </div>
         </div>
-      ))}
+      )})}
 
       {/* Defects + signature */}
       <div className="bg-[#111827] rounded-2xl border border-[#1f2937] p-5 space-y-3">
@@ -438,7 +443,7 @@ function PreTripSection() {
         <button type="submit"
           disabled={saving || !form.truck_id || !form.driver_signature}
           className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-4 rounded-xl text-sm disabled:opacity-50 transition-colors">
-          {saving ? 'Submitting...' : failCount > 0 ? `⚠️ Submit with ${failCount} Defect${failCount>1?'s':''}` : '✓ Submit Inspection'}
+          {saving ? 'Submitting...' : failCount > 0 ? `Submit with ${failCount} Defect${failCount>1?'s':''}` : 'Submit Inspection'}
         </button>
       </div>
     </form>
@@ -461,16 +466,16 @@ const STATUS_COLORS = {
 }
 const STATUS_LABELS = {
   pending:'Pending', dispatched:'Dispatched — Ready to Load', loaded:'Loaded',
-  in_transit:'On the Road', delivered:'Delivered ✓', invoiced:'Invoice Sent', paid:'Paid ✓'
+  in_transit:'On the Road', delivered:'Delivered', invoiced:'Invoice Sent', paid:'Paid'
 }
-const MATERIAL_EMOJI = {
-  'General Freight':'📦','Auto Parts':'🔧','Building Materials':'🏗️','Electronics':'💻',
-  'Food & Beverage':'🥡','Furniture / Household':'🛋️','Hazmat':'⚠️','Heavy Equipment':'⚙️',
-  'Lumber':'🪵','Machinery':'🏭','Oversized / Wide Load':'📐','Palletized Goods':'📦',
-  'Refrigerated / Reefer':'❄️','Steel / Metal':'🔩','Other':'🚛',
-  asphalt:'🛣️',gravel:'🪨',sand:'🏜️',salt:'🧂',dirt:'🌱',topsoil:'🌍',concrete:'🏗️',
-  'Packaged Food':'🥡','Steel Beams':'🔩','Lumber / Building Materials':'🪵',
-  'General Retail Freight':'📦','Electronics / Palletized':'💻',
+const MATERIAL_ICONS = {
+  'General Freight': Package, 'Auto Parts': Wrench, 'Building Materials': Hammer, 'Electronics': Laptop,
+  'Food & Beverage': Utensils, 'Furniture / Household': Sofa, 'Hazmat': AlertTriangle, 'Heavy Equipment': Cog,
+  'Lumber': Trees, 'Machinery': Factory, 'Oversized / Wide Load': Ruler, 'Palletized Goods': Package,
+  'Refrigerated / Reefer': Snowflake, 'Steel / Metal': Cable, 'Other': Truck,
+  asphalt: Package, gravel: Package, sand: Package, salt: Package, dirt: Package, topsoil: Package, concrete: Hammer,
+  'Packaged Food': Utensils, 'Steel Beams': Cable, 'Lumber / Building Materials': Trees,
+  'General Retail Freight': Package, 'Electronics / Palletized': Laptop,
 }
 
 function LoadCard({ load, onUpdate }) {
@@ -495,7 +500,10 @@ function LoadCard({ load, onUpdate }) {
       <div className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">{MATERIAL_EMOJI[load.material] || '📦'}</span>
+            {(() => {
+              const MaterialIcon = MATERIAL_ICONS[load.material] || Package
+              return <MaterialIcon size={20} className="text-amber-400" />
+            })()}
             <div>
               <div className="font-bold text-white capitalize">{load.material}</div>
               <div className="text-xs text-slate-500">{load.truck_name} · {load.plate}</div>
@@ -576,7 +584,7 @@ export default function MyLoads() {
       <div className="bg-[#111827] border-b border-[#1f2937] px-4 pt-4 sticky top-0 z-10">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">🚛</span>
+            <Truck size={20} className="text-amber-400" />
             <div>
               <div className="font-bold text-white">PAYLOAD</div>
               <div className="text-xs text-slate-500">Driver View</div>

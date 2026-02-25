@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { LayoutDashboard, Truck, ClipboardList, BarChart3, Users, Wrench, UserCog, BookOpen, Fuel, LogOut, Menu } from 'lucide-react'
+import { LayoutDashboard, Truck, ClipboardList, BarChart3, Users, Wrench, UserCog, BookOpen, Fuel, LogOut, Menu, Building2 } from 'lucide-react'
 import FeedbackButton from './FeedbackButton'
 import HelpDesk from './HelpDesk'
 import { isOwner } from '../lib/auth'
@@ -10,8 +10,9 @@ const allNav = [
   { to: '/loads',      icon: ClipboardList,   label: 'Loads',       ownerOnly: true  },
   { to: '/my-loads',   icon: ClipboardList,   label: 'My Loads',    ownerOnly: false, driverOnly: true },
   { to: '/logbook',    icon: BookOpen,        label: 'Logbook',     ownerOnly: false, driverOnly: false },
-  { to: '/fuel',       icon: Fuel,            label: '⛽ Fuel',      ownerOnly: true  },
+  { to: '/fuel',       icon: Fuel,            label: 'Fuel',         ownerOnly: true  },
   { to: '/trucks',     icon: Truck,           label: 'Fleet',       ownerOnly: true  },
+  { to: '/customers',  icon: Building2,       label: 'Customers',   ownerOnly: true  },
   { to: '/drivers',    icon: Users,           label: 'Drivers',     ownerOnly: true  },
   { to: '/maintenance',icon: Wrench,          label: 'Maintenance', ownerOnly: true  },
   { to: '/reports',    icon: BarChart3,       label: 'Reports',     ownerOnly: true  },
@@ -34,7 +35,7 @@ export default function Layout() {
     <div className="flex flex-col h-full">
       <div className="p-5 border-b border-[#1f2937]">
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-9 h-9 bg-amber-500 rounded-lg flex items-center justify-center text-lg">🚛</div>
+          <div className="w-9 h-9 bg-amber-500 rounded-lg flex items-center justify-center"><Truck size={16} className="text-black" /></div>
           <div>
             <div className="font-bold text-white text-sm">PAYLOAD</div>
             <div className="text-[10px] text-slate-500">Fleet HQ</div>
@@ -70,7 +71,7 @@ export default function Layout() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="md:hidden flex items-center gap-3 px-4 py-3 bg-[#111827] border-b border-[#1f2937]">
           <button onClick={() => setOpen(true)} className="text-slate-400 hover:text-white"><Menu size={20} /></button>
-          <span className="font-bold text-sm">🚛 PAYLOAD</span>
+          <span className="font-bold text-sm inline-flex items-center gap-2"><Truck size={14} className="text-amber-400" /> PAYLOAD</span>
         </header>
         <main className="flex-1 overflow-auto p-4 md:p-6"><Outlet /><FeedbackButton /><HelpDesk /></main>
       </div>

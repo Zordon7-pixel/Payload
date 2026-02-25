@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Truck } from 'lucide-react'
 import api from '../lib/api'
 
 export default function Login() {
@@ -17,7 +18,7 @@ export default function Login() {
     <div className="min-h-screen bg-[#0a0f1e] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="text-6xl mb-3">🚛</div>
+          <div className="mb-3 flex justify-center"><Truck size={48} className="text-amber-400" /></div>
           <h1 className="text-3xl font-bold text-white tracking-wide">PAYLOAD</h1>
           <p className="text-xs font-semibold text-amber-400 uppercase tracking-widest mt-2">Trucking Fleet Management</p>
         </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X } from 'lucide-react'
+import { X, Truck } from 'lucide-react'
 import api from '../lib/api'
 import LibraryAutocomplete from './LibraryAutocomplete'
 import { searchCompanies } from '../data/companies'
@@ -27,6 +27,8 @@ const SOURCES = [
   { value: 'dat',       label: 'DAT Load Board' },
   { value: 'truckstop', label: 'Truckstop.com' },
   { value: 'broker',    label: 'Freight Broker' },
+  { value: 'aggtrans',  label: 'Aggtrans' },
+  { value: 'aggdirect', label: 'AggDirect' },
   { value: 'other',     label: 'Other' },
 ]
 
@@ -237,7 +239,7 @@ export default function AddLoadModal({ onClose, onSaved }) {
         <div className="flex justify-between p-5 border-t border-[#1f2937]">
           <button onClick={onClose} className="text-slate-400 hover:text-white text-sm transition-colors">Cancel</button>
           <button onClick={submit} disabled={loading} className="bg-amber-500 hover:bg-amber-400 text-black text-sm font-bold px-5 py-2 rounded-lg transition-colors disabled:opacity-50">
-            {loading ? 'Creating...' : '🚛 Create Load'}
+            {loading ? 'Creating...' : <span className="inline-flex items-center gap-1.5"><Truck size={14} /> Create Load</span>}
           </button>
         </div>
       </div>

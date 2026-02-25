@@ -13,6 +13,7 @@ import MyLoads from './pages/MyLoads'
 import Logbook from './pages/Logbook'
 import FuelLog from './pages/FuelLog'
 import Invoice from './pages/Invoice'
+import Customers from './pages/Customers'
 
 const PrivateRoute = ({ children }) => localStorage.getItem('hc_token') ? children : <Navigate to="/login" />
 
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="loads" element={<Loads />} />
           <Route path="loads/:id" element={<LoadDetail />} />
           <Route path="trucks" element={<Trucks />} />
+          <Route path="customers" element={<OwnerRoute><Customers /></OwnerRoute>} />
           <Route path="drivers" element={<OwnerRoute><Drivers /></OwnerRoute>} />
           <Route path="maintenance" element={<OwnerRoute><Maintenance /></OwnerRoute>} />
           <Route path="reports" element={<OwnerRoute><Reports /></OwnerRoute>} />

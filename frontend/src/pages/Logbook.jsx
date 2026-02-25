@@ -1,22 +1,22 @@
 import { useEffect, useState } from 'react'
-import { BookOpen, ClipboardCheck, ClipboardList, Plus, X, CheckCircle, XCircle, MinusCircle, AlertTriangle, ChevronDown, ChevronUp, Wrench, CheckSquare } from 'lucide-react'
+import { BookOpen, ClipboardCheck, ClipboardList, Plus, X, CheckCircle, XCircle, MinusCircle, AlertTriangle, ChevronDown, ChevronUp, Wrench, CheckSquare, Truck, Circle, Droplets, Link2, Octagon, Lightbulb, Armchair } from 'lucide-react'
 import api from '../lib/api'
 import { isOwner } from '../lib/auth'
 
 const POSTTRIP_GROUPS = [
-  { group:'Body & Exterior',   icon:'🚛', items:[{key:'no_new_damage',label:'No New Body Damage'},{key:'lights_intact',label:'All Lights Intact'},{key:'mirrors_ok',label:'Mirrors Undamaged'},{key:'windshield_ok',label:'Windshield Undamaged'}] },
-  { group:'Mechanical',        icon:'🔧', items:[{key:'no_warning_lights',label:'No Warning Lights'},{key:'no_unusual_sounds',label:'No Unusual Sounds'},{key:'brakes_ok',label:'Brakes Normal'},{key:'steering_ok',label:'Steering Normal'},{key:'transmission_ok',label:'Transmission Normal'}] },
-  { group:'Tires',             icon:'🔘', items:[{key:'no_blowouts',label:'No Blowouts'},{key:'tires_after_run',label:'Tires OK After Run'}] },
-  { group:'Fluids',            icon:'💧', items:[{key:'no_new_leaks',label:'No New Leaks'},{key:'oil_ok_postrun',label:'Oil OK'},{key:'coolant_ok_postrun',label:'No Overheating'}] },
-  { group:'Equipment & Cargo', icon:'⛓️', items:[{key:'straps_chains_ok',label:'Straps / Chains OK'},{key:'tarps_ok',label:'Tarps OK'},{key:'load_area_clear',label:'Load Area Cleared'}] },
-  { group:'End of Shift',      icon:'📋', items:[{key:'cab_clean',label:'Cab Clean'},{key:'windows_secure',label:'Windows Secured'},{key:'fuel_ok',label:'Fuel OK for Tomorrow'}] },
+  { group:'Body & Exterior',   icon: Truck, items:[{key:'no_new_damage',label:'No New Body Damage'},{key:'lights_intact',label:'All Lights Intact'},{key:'mirrors_ok',label:'Mirrors Undamaged'},{key:'windshield_ok',label:'Windshield Undamaged'}] },
+  { group:'Mechanical',        icon: Wrench, items:[{key:'no_warning_lights',label:'No Warning Lights'},{key:'no_unusual_sounds',label:'No Unusual Sounds'},{key:'brakes_ok',label:'Brakes Normal'},{key:'steering_ok',label:'Steering Normal'},{key:'transmission_ok',label:'Transmission Normal'}] },
+  { group:'Tires',             icon: Circle, items:[{key:'no_blowouts',label:'No Blowouts'},{key:'tires_after_run',label:'Tires OK After Run'}] },
+  { group:'Fluids',            icon: Droplets, items:[{key:'no_new_leaks',label:'No New Leaks'},{key:'oil_ok_postrun',label:'Oil OK'},{key:'coolant_ok_postrun',label:'No Overheating'}] },
+  { group:'Equipment & Cargo', icon: Link2, items:[{key:'straps_chains_ok',label:'Straps / Chains OK'},{key:'tarps_ok',label:'Tarps OK'},{key:'load_area_clear',label:'Load Area Cleared'}] },
+  { group:'End of Shift',      icon: ClipboardList, items:[{key:'cab_clean',label:'Cab Clean'},{key:'windows_secure',label:'Windows Secured'},{key:'fuel_ok',label:'Fuel OK for Tomorrow'}] },
 ]
 
 // ── Pre-Trip Inspection Items ──────────────────────────────────────────────
 const INSPECTION_GROUPS = [
   {
     group: 'Brakes',
-    icon: '🛑',
+    icon: Octagon,
     items: [
       { key: 'service_brakes',  label: 'Service Brakes' },
       { key: 'parking_brake',   label: 'Parking Brake' },
@@ -24,7 +24,7 @@ const INSPECTION_GROUPS = [
   },
   {
     group: 'Lights',
-    icon: '💡',
+    icon: Lightbulb,
     items: [
       { key: 'headlights',      label: 'Headlights' },
       { key: 'taillights',      label: 'Taillights' },
@@ -36,7 +36,7 @@ const INSPECTION_GROUPS = [
   },
   {
     group: 'Tires & Wheels',
-    icon: '🔘',
+    icon: Circle,
     items: [
       { key: 'tire_condition',  label: 'Tire Condition & Tread' },
       { key: 'tire_inflation',  label: 'Tire Inflation' },
@@ -46,7 +46,7 @@ const INSPECTION_GROUPS = [
   },
   {
     group: 'Exterior',
-    icon: '🪞',
+    icon: Truck,
     items: [
       { key: 'mirrors',         label: 'Mirrors (both sides)' },
       { key: 'windshield',      label: 'Windshield (no cracks)' },
@@ -57,7 +57,7 @@ const INSPECTION_GROUPS = [
   },
   {
     group: 'Engine & Fluids',
-    icon: '🔧',
+    icon: Wrench,
     items: [
       { key: 'oil_level',       label: 'Oil Level' },
       { key: 'coolant_level',   label: 'Coolant Level' },
@@ -69,7 +69,7 @@ const INSPECTION_GROUPS = [
   },
   {
     group: 'Cab Interior',
-    icon: '🪑',
+    icon: Armchair,
     items: [
       { key: 'seatbelt',        label: 'Seatbelt' },
       { key: 'steering',        label: 'Steering (no excessive play)' },
@@ -81,7 +81,7 @@ const INSPECTION_GROUPS = [
   },
   {
     group: 'Body & Frame',
-    icon: '🚛',
+    icon: Truck,
     items: [
       { key: 'body_damage',     label: 'No New Body Damage' },
       { key: 'doors_secure',    label: 'Doors & Latches Secure' },
@@ -290,7 +290,7 @@ export default function Logbook() {
                   {l.notes && <p className="text-xs text-slate-400 mt-2 leading-relaxed">{l.notes}</p>}
                   {l.incidents && (
                     <div className="mt-2 bg-red-900/20 border border-red-700/30 rounded-lg px-3 py-2">
-                      <span className="text-[10px] text-red-400 font-semibold uppercase tracking-wide">⚠️ Incident: </span>
+                      <span className="text-[10px] text-red-400 font-semibold uppercase tracking-wide inline-flex items-center gap-1"><AlertTriangle size={10} /> Incident:</span>
                       <span className="text-xs text-red-300">{l.incidents}</span>
                     </div>
                   )}
@@ -331,7 +331,7 @@ export default function Logbook() {
                             {insp.inspection_date}
                             {insp.repair_status === 'pending' && <span className="text-[10px] bg-red-900/40 text-red-400 border border-red-700/40 px-2 py-0.5 rounded-full">REPAIR NEEDED</span>}
                             {insp.repair_status === 'scheduled' && <span className="text-[10px] bg-amber-900/40 text-amber-400 border border-amber-700/40 px-2 py-0.5 rounded-full">SCHEDULED</span>}
-                            {insp.repair_status === 'repaired' && <span className="text-[10px] bg-emerald-900/40 text-emerald-400 border border-emerald-700/40 px-2 py-0.5 rounded-full">REPAIRED ✓</span>}
+                            {insp.repair_status === 'repaired' && <span className="text-[10px] bg-emerald-900/40 text-emerald-400 border border-emerald-700/40 px-2 py-0.5 rounded-full">REPAIRED</span>}
                           </div>
                           <div className="text-xs text-slate-500">{insp.truck_name} · {insp.truck_plate}{owner && insp.driver_name ? ` · ${insp.driver_name}` : ''}</div>
                         </div>
@@ -362,9 +362,9 @@ export default function Logbook() {
                         {/* Owner repair control */}
                         {owner && (
                           <div className="bg-[#0a0f1e] rounded-xl p-3 space-y-2 border border-[#1f2937]">
-                            <div className="text-xs font-semibold text-amber-400 mb-2">🔧 Repair Status (Owner)</div>
+                            <div className="text-xs font-semibold text-amber-400 mb-2 inline-flex items-center gap-1"><Wrench size={12} /> Repair Status (Owner)</div>
                             <div className="flex gap-2">
-                              {[{v:'pending',label:'Needs Repair',cls:'border-red-600 text-red-400'},{v:'scheduled',label:'Scheduled',cls:'border-amber-600 text-amber-400'},{v:'repaired',label:'Repaired ✓',cls:'border-emerald-600 text-emerald-400'}].map(opt => (
+                              {[{v:'pending',label:'Needs Repair',cls:'border-red-600 text-red-400'},{v:'scheduled',label:'Scheduled',cls:'border-amber-600 text-amber-400'},{v:'repaired',label:'Repaired',cls:'border-emerald-600 text-emerald-400'}].map(opt => (
                                 <button key={opt.v} type="button"
                                   onClick={() => setRepairForms(f => ({...f, [insp.id]:{ ...rf, repair_status: opt.v }}))}
                                   className={`flex-1 py-2 rounded-lg border text-xs font-semibold transition-all ${rf.repair_status === opt.v ? opt.cls + ' bg-opacity-20' : 'border-[#1f2937] text-slate-500 hover:border-slate-500'}`}>
@@ -436,9 +436,11 @@ export default function Logbook() {
               </div>
 
               {/* Inspection Groups */}
-              {INSPECTION_GROUPS.map(group => (
+              {INSPECTION_GROUPS.map(group => {
+                const GroupIcon = group.icon
+                return (
                 <div key={group.group} className="bg-[#111827] rounded-2xl border border-[#1f2937] p-4">
-                  <h4 className="text-sm font-bold text-white mb-3">{group.icon} {group.group}</h4>
+                  <h4 className="text-sm font-bold text-white mb-3 inline-flex items-center gap-1.5"><GroupIcon size={14} /> {group.group}</h4>
                   <div className="space-y-3">
                     {group.items.map(item => (
                       <div key={item.key} className="flex items-center justify-between gap-3">
@@ -451,7 +453,7 @@ export default function Logbook() {
                     ))}
                   </div>
                 </div>
-              ))}
+              )})}
 
               {/* Defects & Signature */}
               <div className="bg-[#111827] rounded-2xl border border-[#1f2937] p-5 space-y-3">
@@ -473,7 +475,7 @@ export default function Logbook() {
                 </p>
                 <button type="submit" disabled={saving || !inspForm.truck_id || !inspForm.driver_signature}
                   className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3.5 rounded-xl text-sm disabled:opacity-50 transition-colors">
-                  {saving ? 'Submitting...' : failCount > 0 ? `⚠️ Submit with ${failCount} Defect${failCount>1?'s':''}` : '✓ Submit Inspection'}
+                  {saving ? 'Submitting...' : failCount > 0 ? `Submit with ${failCount} Defect${failCount>1?'s':''}` : 'Submit Inspection'}
                 </button>
               </div>
             </form>

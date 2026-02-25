@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Printer, ArrowLeft, CheckCircle } from 'lucide-react'
+import { Printer, ArrowLeft, CheckCircle, Truck } from 'lucide-react'
 import api from '../lib/api'
 
 const RATE_LABELS = { per_mile:'Per Mile', flat_rate:'Flat Rate', per_ton:'Per Ton' }
@@ -61,7 +61,7 @@ export default function Invoice() {
         <div className="bg-[#0a0f1e] px-8 py-7 flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-3xl">🚛</span>
+              <Truck size={28} className="text-amber-400" />
               <div>
                 <div className="text-2xl font-black text-white tracking-tight">PAYLOAD</div>
                 <div className="text-xs text-amber-400 font-semibold tracking-widest uppercase">Fleet Management</div>
@@ -85,7 +85,7 @@ export default function Invoice() {
               <div><span className="text-slate-500">Due:</span> <span className="text-white">{dueDate}</span></div>
               <div className="mt-2">
                 <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${load.paid ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-black'}`}>
-                  {load.paid ? '✓ PAID' : 'PAYMENT DUE'}
+                  {load.paid ? 'PAID' : 'PAYMENT DUE'}
                 </span>
               </div>
             </div>
@@ -191,7 +191,7 @@ export default function Invoice() {
               </div>
               {load.paid && (
                 <div className="flex justify-between text-sm font-bold text-emerald-600">
-                  <span>✓ Payment Received</span>
+                  <span>Payment Received</span>
                   <span>-${gross.toFixed(2)}</span>
                 </div>
               )}
